@@ -1,0 +1,25 @@
+{
+  "name": "GitHubReminder",
+  "private": true,
+  "version": "0.0.1",
+  "author": "Phil Booth <pmbooth@gmail.com",
+  "contributors": [
+    { "name": "Phil Booth", "email": "pmbooth@gmail.com" }
+  ],
+  "scripts": {
+      "start": "roy -r server"
+  },
+  "dependencies": {
+    "roy": "0.1.x"
+  },
+  "devDependencies": {
+  },
+  "engines": {
+    "node": "0.10.x"
+  },
+  "subdomain": "TODO: SUBDOMAIN FOR NODEJITSU",
+  "domains": [
+    "TODO: DOMAIN",
+    "TODO: www.DOMAIN"
+  ]
+}
