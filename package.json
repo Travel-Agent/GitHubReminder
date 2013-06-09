@@ -10,7 +10,8 @@
       "start": "roy -r server"
   },
   "dependencies": {
-    "coffee-script-redux": "2.0.x"
+    "coffee-script-redux": "2.0.x",
+    "hapi": "1.7.x"
   },
   "devDependencies": {
   },
