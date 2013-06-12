@@ -7,12 +7,13 @@
     { "name": "Phil Booth", "email": "pmbooth@gmail.com" }
   ],
   "scripts": {
-      "start": "roy -r server"
+      "start": "coffee server/index.coffee"
   },
   "dependencies": {
     "coffee-script-redux": "2.0.x",
     "hapi": "1.7.x",
-    "handlebars": "1.0.x"
+    "handlebars": "1.0.x",
+    "oauth": "0.9.x"
   },
   "devDependencies": {
   },
