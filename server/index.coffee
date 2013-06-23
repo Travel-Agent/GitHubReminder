@@ -1,8 +1,29 @@
 coffee = require 'coffee-script-redux'
 coffee.register()
 
+fs = require 'fs'
+path = require 'path'
 hapi = require 'hapi'
+handlebars = require 'handlebars'
 config = require '../config'
+
+handlebars.registerHelper 'block', (name, options) ->
+  if typeof handlebars.partials[name] is 'string'
+    handlebars.partials[name] = handlebars.compile handlebars.partials[name]
+
+  partial = handlebars.partials[name] || options.fn;
+
+  partial this, data: options.hash
+
+handlebars.registerHelper 'partial', (name, options) ->
+  handlebars.registerPartial name, options.fn
+
+fs.readFile path.resolve(__dirname, '../views/layout.html'), encoding: 'utf8', (error, template) ->
+  if error
+    console.log "Fatal error reading layout.html: #{error}"
+    process.exit 1
+  else
+    handlebars.registerPartial 'layout', handlebars.compile template
 
 server = hapi.createServer 'localhost', 8000,
   views:
@@ -11,11 +32,12 @@ server = hapi.createServer 'localhost', 8000,
       html: 'handlebars'
   auth:
     scheme: 'cookie'
+    password: config.cookies.password
     isSecure: false # TODO: Investigate SSL, set to true
     redirectTo: '/signin'
     appendNext: true
 
-server.routes [
+server.route [
   {
     path: '/signin'
     method: 'GET'
@@ -24,8 +46,7 @@ server.routes [
         if this.auth.isAuthenticated
           return thisreply.redirect '/'
 
-        # TODO: Inherit from layout with http://thejohnfreeman.com/blog/2012/03/23/template-inheritance-for-handlebars.html
-        this.reply.view 'content/signin.html'
+        this.reply.view 'content/signin.html',
           url: 'TODO: Create OAuth URL - see http://developer.github.com/v3/oauth'
       auth:
         mode: 'try'

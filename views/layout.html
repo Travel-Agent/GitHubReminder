@@ -1,21 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>{{meta.pageTitle}} | {{meta.siteTitle}}</title>
+    <title>{{#block 'title'}}{{/block}} | GitHubReminder.org</title>
 
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="HandheldFriendly" content="True"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="description" content="{{meta.description}}"/>
+    <meta name="description" content="An automated reminder service for your GitHub starred repos."/>
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
     <link rel="stylesheet" href="/style/GitHubReminder.css"/>
   </head>
 
   <body>
-    {{!-- TODO: Get this working with http://thejohnfreeman.com/blog/2012/03/23/template-inheritance-for-handlebars.html -->
-    {{#content}}{{/content}}
+    {{#block 'content'}}{{/block}}
   </body>
 </html>
 
