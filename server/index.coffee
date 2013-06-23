@@ -47,7 +47,8 @@ server.route [
           return thisreply.redirect '/'
 
         this.reply.view 'content/signin.html',
-          url: 'TODO: Create OAuth URL - see http://developer.github.com/v3/oauth'
+          # TODO: Generate state on the fly? Would need to store states in db, along with http response code
+          url: "#{config.oauth.github.uri}?client_id=#{config.oauth.github.id}&scope=#{config.oauth.github.scope}&state=#{config.oauth.github.state}"
       auth:
         mode: 'try'
   }
@@ -55,9 +56,16 @@ server.route [
     path: config.oauth.github.route
     method: 'GET'
     config:
-      # TODO: Process this.query, set session cookie
       handler: ->
-      auth: true
+        # TODO: Check this.query.code?
+        if this.query.client_id is config.oauth.github.id and this.query.client_secret is config.oauth.github.secret
+          console.dir this
+          # TODO: Fetch user from database, or create new user with default settings
+          this.auth.session.set
+            github: 'TODO: Get access_token from the request body'
+          this.reply.redirect '/'
+
+      auth: false
   }
   {
     path: '/signout'
@@ -73,6 +81,12 @@ server.route [
     method: 'GET'
     config:
       handler: ->
+        this.reply.view 'content/index.html',
+          username: 'TODO
+          repos: [
+          ]
+          isWeekly:
+          isSaved:
       auth: true
   }
   {
