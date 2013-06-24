@@ -22,5 +22,7 @@ server = hapi.createServer 'localhost', 8000,
 
 routes.initialise server
 
+console.log 'Awaiting connections...'
+
 server.start()
 

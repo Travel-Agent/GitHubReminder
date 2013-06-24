@@ -13,7 +13,7 @@ initialise = (server) ->
             return thisreply.redirect '/'
 
           this.reply.view 'content/signin.html',
-            # TODO: Generate state on the fly? Would need to store states in db, along with http response code
+            # TODO: Generate state on the fly? Would need to store states in db
             url: "#{config.oauth.github.uri}?client_id=#{config.oauth.github.id}&scope=#{config.oauth.github.scope}&state=#{config.oauth.github.state}"
         auth:
           mode: 'try'
@@ -23,15 +23,15 @@ initialise = (server) ->
       method: 'GET'
       config:
         handler: ->
-          # TODO: Check this.query.code?
-          if this.query.client_id is config.oauth.github.id and this.query.client_secret is config.oauth.github.secret
+          if this.query.state is config.oauth.github.state
             console.dir this
             # TODO: Fetch user from database, or create new user with default settings
             this.auth.session.set
-              github: 'TODO: Get access_token from the request body'
+              github: this.query.code
             this.reply.redirect '/'
 
-        auth: false
+        auth:
+          mode: 'try'
     }
     {
       path: '/signout'
