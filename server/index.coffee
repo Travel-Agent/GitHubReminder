@@ -8,7 +8,7 @@ hapi = require 'hapi'
 config = require '../config'
 routes = require './routes'
 
-server = hapi.createServer 'localhost', 8000,
+server = hapi.createServer 'localhost', 80,
   views:
     path: 'views'
     engines:
