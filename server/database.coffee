@@ -28,44 +28,36 @@ connect = ->
       log 'connection opened'
 
     getCollections = ->
-      log 'fetching collection names'
-
-      connection.collectionNames (error, collectionNames) ->
-        if error
-          log 'failed to fetch collection names'
-          return getCollections()
-
-        log 'fetched collection names'
-
-        if collectionNames.indexOf "#{connection.name}.users' is -1
+      doAsync 'collectionNames', [], (collectionNames) ->
+        if collectionNames.indexOf "#{connection.name}.users" is -1
           createUsersCollection()
         else
           getUsersCollection()
 
-    createUsersCollection = ->
-      log 'creating `users` collection'
+    doAsync = (methodName, args, after) ->
+      log "calling `#{methodName}`"
 
-      connection.createCollection 'users', (error, collection) ->
+      argsAsync = args.splice 0
+
+      argsAsync.push (error, result) ->
         if error
-          log 'failed to create `users` collection'
-          return createUsersCollection()
+          log "`#{methodName}` returned error"
+          return doAsync methodName, args
+        log "`#{methodName}` returned ok"
+        after result
 
-        log 'created `users` collection'
+      connection[methodName].apply connection, argsAsync
 
-        users = collection
+    createUsersCollection = ->
+      doAsync 'createCollection', [ 'users' ], setUsersCollection
 
     getUsersCollection = ->
-      connection.collection 'users', (error, collection) ->
-        if error
-          log 'failed to fetch `users` collection'
-          return getUsersCollection()
+      doAsync 'collection', [ 'users' ], setUsersCollection
 
-        log 'fetched `users` collection'
-
-        users = collection
+    setUsersCollection = (collection) ->
+      users = collection
 
     getCollections()
-    # TODO: Fantasy-land promises for when either get or create users collection has passed?
 
 log = (message) ->
   console.log "server/database: #{message}"
