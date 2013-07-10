@@ -8,7 +8,9 @@ hapi = require 'hapi'
 config = require '../config'
 routes = require './routes'
 
-server = hapi.createServer 'localhost', 80,
+port = 80
+
+server = hapi.createServer 'localhost', port,
   views:
     path: 'views'
     engines:
@@ -22,7 +24,7 @@ server = hapi.createServer 'localhost', 80,
 
 routes.initialise server
 
-console.log 'Awaiting connections...'
+console.log "Awaiting connections on port #{port}'
 
 server.start()
 
