@@ -2,7 +2,10 @@ coffee = require 'coffee-script-redux'
 coffee.register()
 
 templates = require './templates'
-templates.prepare()
+templates.initialise()
+
+database = require './database'
+database.initialise()
 
 hapi = require 'hapi'
 config = require '../config'

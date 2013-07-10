@@ -62,3 +62,5 @@ connect = ->
 log = (message) ->
   console.log "server/database: #{message}"
 
+module.exports = { initialise }
+

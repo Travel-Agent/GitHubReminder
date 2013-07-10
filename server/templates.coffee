@@ -4,7 +4,7 @@ handlebars = require 'handlebars'
 
 layoutPath = path.resolve __dirname, '../views/layout.html'
 
-prepare = ->
+initialise = ->
   log 'registering helpers'
 
   handlebars.registerHelper 'block', blockHelper
@@ -37,5 +37,5 @@ registerLayout = (error, template) ->
 log = (message) ->
   console.log "server/templates: #{message}"
 
-module.exports = { prepare }
+module.exports = { initialise }
 
