@@ -6,61 +6,53 @@ config = require('../config').database
 initialise = ->
   log 'initialising'
   server = new mongo.Server config.development.host, config.development.port, auto_reconnect: true
-  db = new mongo.Db config.development.name, server, strict: true
-  db.open connect
+  connect new mongo.Db config.development.name, server, strict: true
 
-connect = ->
-  log "connecting to `#{config.development.name}` on `#{config.development.host}:#{config.development.port}`"
+connect = (database) ->
+  doAsync database, 'open', [], connected
 
-  db.open (error, connection) ->
-    if error
-      log 'failed to connect'
-      return connect()
+connected = (connection) ->
+  users = undefined
 
-    log 'connected'
+  getCollections = ->
+    doAsync connection, 'collectionNames', [], (collectionNames) ->
+      if collectionNames.indexOf "#{connection.name}.users" is -1
+        createUsersCollection()
+      else
+        getUsersCollection()
 
-    users = undefined
+  createUsersCollection = ->
+    doAsync connection, 'createCollection', [ 'users' ], setUsersCollection
 
-    connection.on 'close', ->
-      log 'connection closed'
+  getUsersCollection = ->
+    doAsync connection, 'collection', [ 'users' ], setUsersCollection
 
-    connection.on 'open', ->
-      log 'connection opened'
+  setUsersCollection = (collection) ->
+    users = collection
 
-    getCollections = ->
-      doAsync 'collectionNames', [], (collectionNames) ->
-        if collectionNames.indexOf "#{connection.name}.users" is -1
-          createUsersCollection()
-        else
-          getUsersCollection()
+  connection.on 'close', ->
+    log 'connection closed'
+  connection.on 'open', ->
+    log 'connection opened'
 
-    doAsync = (methodName, args, after) ->
-      log "calling `#{methodName}`"
-
-      argsAsync = args.splice 0
-
-      argsAsync.push (error, result) ->
-        if error
-          log "`#{methodName}` returned error"
-          return doAsync methodName, args
-        log "`#{methodName}` returned ok"
-        after result
-
-      connection[methodName].apply connection, argsAsync
-
-    createUsersCollection = ->
-      doAsync 'createCollection', [ 'users' ], setUsersCollection
-
-    getUsersCollection = ->
-      doAsync 'collection', [ 'users' ], setUsersCollection
-
-    setUsersCollection = (collection) ->
-      users = collection
-
-    getCollections()
+  getCollections()
 
 log = (message) ->
   console.log "server/database: #{message}"
+
+doAsync = (object, methodName, args, after) ->
+  log "calling `#{methodName}`"
+
+  argsAsync = args.slice 0
+
+  argsAsync.push (error, result) ->
+    if error
+      log "`#{methodName}` returned error"
+      return doAsync object, methodName, args, after
+    log "`#{methodName}` returned ok"
+    after result
+
+  object[methodName].apply object, argsAsync
 
 module.exports = { initialise }
 
