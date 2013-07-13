@@ -47,7 +47,7 @@ doAsync = (object, methodName, args, after) ->
 
   argsAsync.push (error, result) ->
     if error
-      log "`#{methodName}` returned error"
+      log "`#{methodName}` returned error `#{error}`"
       return doAsync object, methodName, args, after
     log "`#{methodName}` returned ok"
     after result
