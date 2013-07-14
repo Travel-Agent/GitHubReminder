@@ -3,6 +3,8 @@
 mongo = require 'mongodb'
 config = require('../config').database
 
+maxRetries = 10
+
 initialise = ->
   log 'initialising'
   server = new mongo.Server config.development.host, config.development.port, auto_reconnect: true
@@ -40,15 +42,15 @@ connected = (connection) ->
 log = (message) ->
   console.log "server/database: #{message}"
 
-doAsync = (object, methodName, args, after) ->
+doAsync = (object, methodName, args, after, retryCount = 0) ->
   log "calling `#{methodName}`"
 
   argsAsync = args.slice 0
 
   argsAsync.push (error, result) ->
-    if error
+    if error and retryCount < maxRetries
       log "`#{methodName}` returned error `#{error}`"
-      return doAsync object, methodName, args, after
+      return doAsync object, methodName, args, after, retryCount + 1
     log "`#{methodName}` returned ok"
     after result
 
