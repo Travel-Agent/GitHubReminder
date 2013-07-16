@@ -7,13 +7,14 @@
     { "name": "Phil Booth", "email": "pmbooth@gmail.com" }
   ],
   "scripts": {
-      "start": "coffee server/index.coffee"
+      "start": "./node_modules/.bin/coffee server/index.coffee"
   },
   "dependencies": {
     "coffee-script-redux": "2.0.x",
     "hapi": "1.8.x",
     "handlebars": "1.0.x",
-    "mongodb": "1.3.x"
+    "mongodb": "1.3.x",
+    "pub-sub": "0.1.x"
   },
   "devDependencies": {
   },
