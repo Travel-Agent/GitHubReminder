@@ -39,24 +39,21 @@ connected = (connection) ->
 
     eventBroker.subscribe
       name: 'fetch-user'
-      callback: read
+      callback: fetchUser
     eventBroker.subscribe
       name: 'store-user'
-      callback: write
+      callback: storeUser
 
     connection.on 'close', ->
       log 'connection closed'
     connection.on 'open', ->
       log 'connection opened'
 
-  read = (event) ->
-    # TODO: users.findOne
-    # http://mongodb.github.io/node-mongodb-native/api-generated/collection.html#findone
+  fetchUser = (event) ->
+    doAsync users, 'findOne', [ event.getData() ], event.respond
 
-  write = (event) ->
-    # TODO: users.insert or users.update
-    # http://mongodb.github.io/node-mongodb-native/api-generated/collection.html#insert
-    # http://mongodb.github.io/node-mongodb-native/api-generated/collection.html#update
+  storeUser = (event) ->
+    doAsync users, 'update', [ event.getData(), { upsert: true, w: 1 } ], event.respond
 
   getCollections()
 
@@ -74,6 +71,7 @@ doAsync = (object, methodName, args, after, retryCount = 0) ->
         log "`#{methodName}` returned error `#{error}`"
         return doAsync object, methodName, args, after, retryCount + 1
 
+      # TODO: Replace with email alert before production deployment
       process.exit 1
 
     log "`#{methodName}` returned ok"
