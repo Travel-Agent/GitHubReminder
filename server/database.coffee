@@ -9,7 +9,7 @@ maxRetries = 10
 initialise = ->
   log 'initialising'
   server = new mongo.Server config.development.host, config.development.port, auto_reconnect: true
-  connect new mongo.Db config.development.name, server, strict: true
+  connect new mongo.Db config.development.name, server, w: 1
 
 connect = (database) ->
   doAsync database, 'open', [], connected
@@ -32,7 +32,10 @@ connected = (connection) ->
 
   setUsersCollection = (collection) ->
     users = collection
-    bindEvents()
+    createUsersIndex()
+
+  createUsersIndex = ->
+    doAsync connection, 'ensureIndex', [ 'users', { email: 1 }, { unique: true, w: 1 } ], bindEvents
 
   bindEvents = ->
     eventBroker = pubsub.getEventBroker 'ghr'
