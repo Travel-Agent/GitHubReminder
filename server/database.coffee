@@ -41,10 +41,10 @@ connected = (connection) ->
     eventBroker = pubsub.getEventBroker 'ghr'
 
     eventBroker.subscribe
-      name: 'fetch-user'
+      name: 'db-fetch-user'
       callback: fetchUser
     eventBroker.subscribe
-      name: 'store-user'
+      name: 'db-store-user'
       callback: storeUser
 
     connection.on 'close', ->
@@ -53,7 +53,7 @@ connected = (connection) ->
       log 'connection opened'
 
   fetchUser = (event) ->
-    doAsync users, 'findOne', [ event.getData() ], event.respond
+    users.findOne event.getData(), event.respond
 
   storeUser = (event) ->
     doAsync users, 'update', [ event.getData(), { upsert: true, w: 1 } ], event.respond
