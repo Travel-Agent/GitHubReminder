@@ -1,6 +1,6 @@
 'use strict'
 
-pubsub = require 'pubsub'
+pubsub = require 'pub-sub'
 config = require '../../config'
 
 eventBroker = pubsub.getEventBroker 'ghr'

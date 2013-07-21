@@ -6,7 +6,6 @@ module.exports =
   config:
     handler: ->
       this.reply.view 'content/index.html',
-        username: 'TODO: user name'
         repos: [
           'TODO: recently starred repos'
         ]
