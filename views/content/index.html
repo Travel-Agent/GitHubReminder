@@ -1,14 +1,38 @@
 {{#partial 'title'}}Settings{{/partial}}
 {{#partial 'content'}}
 <section>
-  <h2>Your recently starred repositories</h2>
+  <h2>Your account</h2>
+
+  <h3>User name</h3>
+
+  <p>{{username}}</p>
+
+  <h3>Recently starred repositories</h3>
 
   <ul>
     {{#each repos}}
     <li>
-      <h3>{{name}}</h3>
+      <a href="{{html_url}}">
+      <h3>{{full_name}}</h3>
 
       <p>{{description}}<p>
+
+      <ul>
+          <li>
+            <h4>Stars</h4>:
+            {{watchers_count}}
+          </li>
+
+          <li>
+            <h4>Forks</h4>:
+            {{forks_count}}
+          </li>
+
+          <li>
+            <h4>Language</h4>:
+            {{language}}
+          </li>
+        </a>
     </li>
     {{/each}}
   </ul>
@@ -23,8 +47,16 @@
   <h2>Reminder settings</h2>
 
   <form method="post">
-    <label for="input-email">Email address</label>
-    <input type="text" value="{{email}}" name="email" id="input-email"/>
+    <label for="select-email">Email address</label>
+    <select name="email" id="select-email">
+      {{#email}}
+      <option value="{{.}}">{{.}}</option>
+      {{/email}}
+      <option value="other">Other</option>
+    </select>
+
+    <label for="input-email">Other email address</label>
+    <input type="text" name="otherEmail" id="input-email"/>
 
     <label for="select-frequency">Frequency</label>
     <select name="frequency" id="select-frequency">

@@ -3,16 +3,23 @@
 https = require 'https'
 check = require 'check-types'
 
-pubsub = require 'pubsub'
+pubsub = require 'pub-sub'
 eventBroker = pubsub.getEventBroker 'ghr'
 
 packageInfo = require '../package.json'
 userAgent = "#{packageInfo.name}/#{packageInfo.version} (node.js/#{process.version})"
 
+config = require('../config').oauth.development
+
 host = 'api.github.com'
-accept = 'application/vnd.github.v3+json
 
 initialise = ->
+  eventBroker.subscribe
+    name: 'gh-get-token'
+    callback: getToken
+
+  # TODO: Implement gh-get-user
+
   eventBroker.subscribe
     name: 'gh-get-email'
     callback: getEmail
@@ -25,33 +32,50 @@ initialise = ->
     name: 'gh-get-starred-all'
     callback: getAllStarredRepositories
 
-getEmail = (event) ->
-  log 'getting email'
-  https.get
-    host: host
-    path: "/user/emails?access_token=#{event.getData()}"
+getToken = (event) ->
+  request 'access token', {
+    host: 'github.com'
+    path: '/login/oauth/access_token'
+    method: 'POST'
     headers:
       'User-Agent': userAgent
-      'Accept': 'application/vnd.github.v3+json'
-  , (response) ->
-    if response.status is 200
-      log 'got response'
+      'Accept': 'application/json'
+  }, "client_id=#{config.id}&client_secret=#{config.secret}&code=#{event.getData()}", (response) ->
+    event.respond response.access_token
 
-      body = ''
+request = (what, options, data, callback) ->
+  log "requesting #{what} from `#{options.path}`"
+  req = https.request options, (response) ->
+    if response.statusCode is 200
+      log "got #{what} response"
 
-      response.on 'data', (data) ->
+      response.on 'readable', ->
+        data = response.read()
         log "received #{typeof data} data `#{data}`"
-        body += data
+        callback JSON.parse data
 
-      response.on 'end'
-        log 'finished data'
-        event.respond JSON.parse(body).filter((email) ->
-          email.verified === true
-        ).map (email) ->
-          email.email
+  if data
+    log "writing data `#{data}`"
+    req.write data
+
+  req.end()
 
 log = (message) ->
   console.log "server/github: #{message}"
+
+getEmail = (event) ->
+  request 'email', {
+    host: host
+    path: "/user/emails?access_token=#{event.getData()}"
+    method: 'GET'
+    headers:
+      'User-Agent': userAgent
+      'Accept': 'application/vnd.github.v3+json'
+  }, null, (response) ->
+    event.respond response.filter((email) ->
+      email.verified is true
+    ).map (email) ->
+      email.email
 
 getRecentStarredRepositories = (event) ->
   getStars event.getData(), 'created', 'desc', 5, false, event.respond
@@ -60,31 +84,19 @@ getAllStarredRepositories = (event) ->
   getStars event.getData(), 'created', 'asc', 100, true, event.respond
 
 getStars = (oauthToken, sort, direction, count, getAll, callback, results = [], path = '') ->
-  actualPath = path || "/user/starred?access_token=#{oauthToken}&sort=#{sort}&direction=#{direction}&per_page=#{count}"
-  log "getting stars from `actualPath`"
-  https.get
+  request path || "/user/starred?access_token=#{oauthToken}&sort=#{sort}&direction=#{direction}&per_page=#{count}", {
     host: host
     path: actualPath
+    method: 'GET'
     headers:
       'User-Agent': userAgent
-  , (response) ->
-    if response.status is 200
-      log 'got starred repos'
+  }, null, (response) ->
+    results = results.concat response
+    links = parsePaginationLinks response.headers.link
+    if getAll and check.isUnemptyString links.next
+      return getStars '', '', '', '', true, callback, results, links.next.substr links.indexOf(host) + host.length
 
-      body = ''
-
-      response.on 'data', (data) ->
-        log "received #{typeof data} data `#{data}`"
-        body += data
-
-      response.on 'end'
-        log 'finished data'
-        results = results.concat JSON.parse body
-        links = parsePaginationLinks response.headers.link
-        if getAll and check.isUnemptyString links.next
-          return getStars '', '', '', '', true, callback, results, links.next.substr links.indexOf(host) + host.length
-
-        callback results
+    callback results
 
 parsePaginationLinks = (links) ->
   if check.isUnemptyString links
@@ -102,4 +114,6 @@ parsePaginationLink = (link) ->
 combinePaginationLinks = (link, result) ->
   result[link.key] = link.url
   result
+
+module.exports = { initialise }
 

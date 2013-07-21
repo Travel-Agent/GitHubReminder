@@ -35,6 +35,7 @@ connected = (connection) ->
     createUsersIndex()
 
   createUsersIndex = ->
+    # TODO: Change index to user name, emails may not be unique
     doAsync connection, 'ensureIndex', [ 'users', { email: 1 }, { unique: true, w: 1 } ], bindEvents
 
   bindEvents = ->
@@ -64,7 +65,7 @@ log = (message) ->
   console.log "server/database: #{message}"
 
 doAsync = (object, methodName, args, after, retryCount = 0) ->
-  log "calling `#{methodName}`"
+  log "calling `#{methodName}` with arguments `#{arguments}`"
 
   argsAsync = args.slice 0
 

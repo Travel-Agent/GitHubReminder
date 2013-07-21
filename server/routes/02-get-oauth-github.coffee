@@ -1,47 +1,65 @@
 'use strict'
 
 pubsub = require 'pub-sub'
-config = require '../../config'
+config = require('../../config').oauth.development
 
 eventBroker = pubsub.getEventBroker 'ghr'
 
 module.exports =
-  path: config.oauth.github.route
+  path: config.route
   method: 'GET'
   config:
-    handler: ->
-      self = this
+    handler: (request) ->
+      getToken = ->
+        if request.query.state is config.state
+          eventBroker.publish pubsub.createEvent
+            name: 'gh-get-token'
+            data: request.query.code
+            callback: receiveToken
 
-      getEmail = ->
-        if self.query.state is config.oauth.github.state
-          console.log self.query
-          event = pubsub.createEvent
-            name: 'gh-get-email'
-            data: self.query.code
-            callback: receiveEmail
+      receiveToken = (token) ->
+        request.state.auth = token
+        eventBroker.publish pubsub.createEvent
+          name: 'gh-get-email'
+          data: token
+          callback: receiveEmail
 
       receiveEmail = (emails) ->
-        event = pubsub.createEvent
+        # TODO: Get GH user before db user
+        eventBroker.publish pubsub.createEvent
           name: 'db-fetch-user'
           data:
+            # TODO: Query on user name
             email: emails
           callback: (error, user) ->
             receiveUser error, user, emails
 
       receiveUser = (error, user, emails) ->
         if error
-          return respond email: emails
+          # TODO: Store user name instead of email
+          user =
+            email: emails
+            frequency: 'weekly'
+            isSaved: false
+          eventBroker.publish pubsub.createEvent
+            name: 'db-store-user'
+            data: user
+            callback: ->
+              respond user
 
         respond user
 
       respond = (user) ->
-        self.auth.session.set
-          github: self.query.code
-          user: user
-        self.reply.redirect '/'
+        # TODO: Delete user cookie
+        request.state.user = JSON.stringify user
+        request.auth.session.set user
+        request.reply.redirect '/'
 
-      getEmail()
+      getToken()
 
     auth:
       mode: 'try'
+
+log = (message) ->
+  console.log "server/routes/02: #{message}"
 

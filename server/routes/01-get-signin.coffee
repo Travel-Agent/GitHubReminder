@@ -1,6 +1,6 @@
 'use strict'
 
-config = require '../../config'
+config = require('../../config').oauth.development
 
 module.exports =
   path: '/signin'
@@ -12,7 +12,7 @@ module.exports =
 
       this.reply.view 'content/signin.html',
         # TODO: Generate state on the fly? Would need to store states in db
-        url: "#{config.oauth.github.uri}?client_id=#{config.oauth.github.id}&scope=#{config.oauth.github.scope}&state=#{config.oauth.github.state}"
+        url: "#{config.uri}?client_id=#{config.id}&scope=#{config.scope}&state=#{config.state}"
     auth:
       mode: 'try'
 

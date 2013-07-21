@@ -1,11 +1,14 @@
 coffee = require 'coffee-script-redux'
 coffee.register()
 
-templates = require './templates'
-templates.initialise()
-
 database = require './database'
 database.initialise()
+
+github = require './github'
+github.initialise()
+
+templates = require './templates'
+templates.initialise()
 
 hapi = require 'hapi'
 config = require '../config'
