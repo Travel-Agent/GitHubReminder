@@ -14,23 +14,10 @@ config = require('../config').oauth.development
 host = 'api.github.com'
 
 initialise = ->
-  eventBroker.subscribe
-    name: 'gh-get-token'
-    callback: getToken
-
-  # TODO: Implement gh-get-user
-
-  eventBroker.subscribe
-    name: 'gh-get-email'
-    callback: getEmail
-
-  eventBroker.subscribe
-    name: 'gh-get-starred-recent'
-    callback: getRecentStarredRepositories
-
-  eventBroker.subscribe
-    name: 'gh-get-starred-all'
-    callback: getAllStarredRepositories
+  for own eventName, eventHandler of eventHandlers
+    eventBroker.subscribe
+      name: eventName
+      callback: eventHandler
 
 getToken = (event) ->
   request 'access token', {
@@ -62,6 +49,16 @@ request = (what, options, data, callback) ->
 
 log = (message) ->
   console.log "server/github: #{message}"
+
+getUser = (event) ->
+  request 'user', {
+    host: host
+    path: "/user?access_token=#{event.getData()}"
+    method: 'GET'
+    headers:
+      'User-Agent': userAgent
+      'Accept': 'application/json'
+  }, null, event.respond
 
 getEmail = (event) ->
   request 'email', {
@@ -114,6 +111,13 @@ parsePaginationLink = (link) ->
 combinePaginationLinks = (link, result) ->
   result[link.key] = link.url
   result
+
+eventHandlers =
+  'gh-get-token': getToken
+  'gh-get-user': getUser
+  'gh-get-email': getEmail
+  'gh-get-starred-recent': getRecentStarredRepositories
+  'gh-get-starred-all': getAllStarredRepositories
 
 module.exports = { initialise }
 

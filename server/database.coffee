@@ -35,8 +35,7 @@ connected = (connection) ->
     createUsersIndex()
 
   createUsersIndex = ->
-    # TODO: Change index to user name, emails may not be unique
-    doAsync connection, 'ensureIndex', [ 'users', { email: 1 }, { unique: true, w: 1 } ], bindEvents
+    doAsync connection, 'ensureIndex', [ 'users', { name: 1 }, { unique: true, w: 1 } ], bindEvents
 
   bindEvents = ->
     eventBroker = pubsub.getEventBroker 'ghr'
@@ -75,7 +74,7 @@ doAsync = (object, methodName, args, after, retryCount = 0) ->
         log "`#{methodName}` returned error `#{error}`"
         return doAsync object, methodName, args, after, retryCount + 1
 
-      # TODO: Replace with email alert before production deployment
+      # TODO: Replace with email alert and signal to caller fail request
       process.exit 1
 
     log "`#{methodName}` returned ok"

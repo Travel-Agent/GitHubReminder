@@ -9,24 +9,50 @@ module.exports =
   config:
     handler: (request) ->
       console.dir request.state
+      currentUser = currentEmails = currentStars = undefined
+      outstandingRequests = 3
+
+      # TODO: Sane error handling
+
+      getUser = ->
+        eventBroker.publish pubsub.createEvent
+          name: 'db-fetch-user'
+          data:
+            name: request.state.user
+          callback: (user) ->
+            currentUser = user
+            after()
+
+      after = ->
+        outstandingRequests -= 1
+        if oustandingRequests is 0
+          respond()
+
+      getEmails = (user) ->
+        eventBroker.publish pubsub.createEvent
+          name: 'gh-get-email'
+          data: request.state.auth
+          callback: (emails) ->
+            currentEmails = emails
+            after()
 
       getRecentStars = ->
         eventBroker.publish pubsub.createEvent
           name: 'gh-get-starred-recent'
           data: request.state.auth
-          callback: receiveRecentStars
+          callback: (stars) ->
+            currentStars = stars
+            after()
 
-      receiveRecentStars = (stars) ->
-        # TODO: Get user from database
-        user = JSON.parse request.state.user
+      respond = ->
         request.reply.view 'content/index.html',
-          user: 'TODO: user name, avatar, repo info'
-          repos: stars
-          emails: user.email
-          isDaily: user.frequency is 'daily'
-          isWeekly: user.frequency is 'weekly'
-          isMonthly: user.frequency is 'monthly'
-          isSaved: user.isSaved
+          user: currentUser.name
+          emails: currentEmails
+          repos: currentStars
+          isDaily: currentUser.frequency is 'daily'
+          isWeekly: currentUser.frequency is 'weekly'
+          isMonthly: currentUser.frequency is 'monthly'
+          isSaved: currentUser.isSaved
 
       getRecentStars()
 
