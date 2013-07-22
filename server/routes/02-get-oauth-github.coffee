@@ -12,6 +12,7 @@ module.exports =
   config:
     handler: (request) ->
       # TODO: Sane error handling
+      oauthToken = undefined
 
       getToken = ->
         if request.query.state is config.state
@@ -22,9 +23,9 @@ module.exports =
 
       receiveToken = (token) ->
         # TODO: Work out how to read state in 04
-        #request.session.set 'auth', token
-        request.setState 'auth', token
-        #request.state.auth = token
+        #request.setState 'session', auth: token
+        #oAuthToken = token
+        request.session.set 'auth', { token }
         eventBroker.publish pubsub.createEvent
           name: 'gh-get-user'
           data: token
@@ -63,9 +64,13 @@ module.exports =
 
       respond = (user) ->
         # TODO: Work out how to read state in 04
-        #request.session.set 'user', user.name
-        request.setState 'user', user.name
-        #request.state.user = user.name
+        #request.setState 'session',
+        #  user: user.name
+        #  auth: oauthToken
+        request.session.set 'user', name: user.name
+        #request.session.set 'session',
+        #  user: user.name
+        #  auth: oauthToken
         request.auth.session.set user
         request.reply.redirect '/'
 

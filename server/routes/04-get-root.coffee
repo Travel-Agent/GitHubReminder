@@ -8,7 +8,7 @@ module.exports =
   method: 'GET'
   config:
     handler: (request) ->
-      console.dir request
+      console.dir request.session
       currentUser = currentEmails = currentStars = undefined
       outstandingRequests = 3
 
@@ -19,7 +19,8 @@ module.exports =
         eventBroker.publish pubsub.createEvent
           name: 'db-fetch-user'
           data:
-            name: request.state.user
+            #name: request.state.session.user
+            name: request.session.get('user').name
           callback: (error, user) ->
             if error
               log "error fetching user from database `#{error}`"
@@ -36,7 +37,8 @@ module.exports =
       getEmails = (user) ->
         eventBroker.publish pubsub.createEvent
           name: 'gh-get-email'
-          data: request.state.auth
+          #data: request.state.session.auth
+          data: request.session.get('auth').token
           callback: (emails) ->
             currentEmails = emails
             after()
