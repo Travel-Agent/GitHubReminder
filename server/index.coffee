@@ -28,6 +28,18 @@ server = hapi.createServer 'localhost', port,
     redirectTo: '/signin'
     appendNext: true
 
+# TODO: Once SSL is set up, pass options for these with isSecure: true
+#server.state 'auth'
+#server.state 'user'
+
+#server.pack.allow(ext: true).require 'yar', {
+#  password: config.cookies.password
+#  isSecure: false # TODO: Investigate SSL, set to true
+#}, (error) ->
+#  if error
+#    console.log "server: error initialising cookies `#{error}`"
+#    process.exit 1
+
 routes.initialise server
 
 console.log "server: awaiting connections on port #{port}"

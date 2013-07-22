@@ -1,6 +1,7 @@
 'use strict'
 
 pubsub = require 'pub-sub'
+check = require 'check-types'
 config = require('../../config').oauth.development
 
 eventBroker = pubsub.getEventBroker 'ghr'
@@ -20,7 +21,10 @@ module.exports =
             callback: receiveToken
 
       receiveToken = (token) ->
-        request.state.auth = token
+        # TODO: Work out how to read state in 04
+        #request.session.set 'auth', token
+        request.setState 'auth', token
+        #request.state.auth = token
         eventBroker.publish pubsub.createEvent
           name: 'gh-get-user'
           data: token
@@ -35,22 +39,33 @@ module.exports =
             receiveDbUser error, dbUser, user.login
 
       receiveDbUser = (error, user, name) ->
-        # TODO: Sort out why error is not set if user doesn't exist
+        if check.isObject user
+          return respond user
+
         if error
-          user =
-            name: name
-            frequency: 'weekly'
-            isSaved: false
-          eventBroker.publish pubsub.createEvent
-            name: 'db-store-user'
-            data: user
-            callback: ->
-              respond user
-        else
-          respond user
+          log "error fetching user from database `#{error}`"
+          # TODO: Fail
+
+        user =
+          name: name
+          frequency: 'weekly'
+          isSaved: false
+
+        eventBroker.publish pubsub.createEvent
+          name: 'db-store-user'
+          data: user
+          callback: (error) ->
+            if error
+              log "error storing user in database `#{error}`"
+              # TODO: Fail
+
+            respond user
 
       respond = (user) ->
-        request.state.user = user.name
+        # TODO: Work out how to read state in 04
+        #request.session.set 'user', user.name
+        request.setState 'user', user.name
+        #request.state.user = user.name
         request.auth.session.set user
         request.reply.redirect '/'
 

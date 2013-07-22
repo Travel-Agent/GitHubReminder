@@ -81,9 +81,9 @@ getAllStarredRepositories = (event) ->
   getStars event.getData(), 'created', 'asc', 100, true, event.respond
 
 getStars = (oauthToken, sort, direction, count, getAll, callback, results = [], path = '') ->
-  request path || "/user/starred?access_token=#{oauthToken}&sort=#{sort}&direction=#{direction}&per_page=#{count}", {
+  request 'stars', {
     host: host
-    path: actualPath
+    path: path || "/user/starred?access_token=#{oauthToken}&sort=#{sort}&direction=#{direction}&per_page=#{count}"
     method: 'GET'
     headers:
       'User-Agent': userAgent

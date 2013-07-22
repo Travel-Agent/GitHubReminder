@@ -12,30 +12,32 @@ initialise = ->
   connect new mongo.Db config.development.name, server, w: 1
 
 connect = (database) ->
-  doAsync database, 'open', [], connected
+  doAsync database, 'open', [], connected, true
 
 connected = (connection) ->
   users = eventBroker = undefined
 
   getCollections = ->
-    doAsync connection, 'collectionNames', [], (collectionNames) ->
-      if collectionNames.indexOf "#{connection.name}.users" is -1
-        createUsersCollection()
-      else
-        getUsersCollection()
+    doAsync connection, 'collectionNames', [], receiveCollections, true
+
+  receiveCollections = (collectionNames) ->
+    if collectionNames.indexOf "#{connection.name}.users" is -1
+      return createUsersCollection()
+
+    getUsersCollection()
 
   createUsersCollection = ->
-    doAsync connection, 'createCollection', [ 'users' ], setUsersCollection
+    doAsync connection, 'createCollection', [ 'users' ], setUsersCollection, true
 
   getUsersCollection = ->
-    doAsync connection, 'collection', [ 'users' ], setUsersCollection
+    doAsync connection, 'collection', [ 'users' ], setUsersCollection, true
 
   setUsersCollection = (collection) ->
     users = collection
     createUsersIndex()
 
   createUsersIndex = ->
-    doAsync connection, 'ensureIndex', [ 'users', { name: 1 }, { unique: true, w: 1 } ], bindEvents
+    doAsync connection, 'ensureIndex', [ 'users', { name: 1 }, { unique: true, w: 1 } ], bindEvents, true
 
   bindEvents = ->
     eventBroker = pubsub.getEventBroker 'ghr'
@@ -53,18 +55,18 @@ connected = (connection) ->
       log 'connection opened'
 
   fetchUser = (event) ->
-    users.findOne event.getData(), event.respond
+    doAsync users, 'findOne', [ event.getData() ], event.respond, false
 
   storeUser = (event) ->
-    doAsync users, 'update', [ event.getData(), { upsert: true, w: 1 } ], event.respond
+    doAsync users, 'update', [ event.getData(), { upsert: true, w: 1 } ], event.respond, false
 
   getCollections()
 
 log = (message) ->
   console.log "server/database: #{message}"
 
-doAsync = (object, methodName, args, after, retryCount = 0) ->
-  log "calling `#{methodName}` with arguments `#{arguments}`"
+doAsync = (object, methodName, args, after, failOnError, retryCount = 0) ->
+  log "calling `#{methodName}` with arguments `#{args}`"
 
   argsAsync = args.slice 0
 
@@ -72,13 +74,20 @@ doAsync = (object, methodName, args, after, retryCount = 0) ->
     if error
       if retryCount < maxRetries
         log "`#{methodName}` returned error `#{error}`"
-        return doAsync object, methodName, args, after, retryCount + 1
+        return doAsync object, methodName, args, after, failOnError, retryCount + 1
 
-      # TODO: Replace with email alert and signal to caller fail request
-      process.exit 1
+      if failOnError
+        log 'fatal error, exiting'
+        process.exit 1
+
+      after error, null
 
     log "`#{methodName}` returned ok"
-    after result
+
+    if failOnError
+      return after result
+
+    after null, result
 
   object[methodName].apply object, argsAsync
 
