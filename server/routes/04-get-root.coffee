@@ -15,7 +15,7 @@ module.exports =
       # TODO: Sane error handling
 
       getUser = ->
-        # TODO: Work out how to read state
+        # TODO: ARRRGH! FUCKING STATE!!
         eventBroker.publish pubsub.createEvent
           name: 'db-fetch-user'
           data:
@@ -44,7 +44,7 @@ module.exports =
             after()
 
       getRecentStars = ->
-        # TODO: Work out how to read state
+        # TODO: ARRRGH! FUCKING STATE!!
         eventBroker.publish pubsub.createEvent
           name: 'gh-get-starred-recent'
           data: request.state.auth

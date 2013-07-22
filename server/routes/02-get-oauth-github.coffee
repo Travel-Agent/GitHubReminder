@@ -22,8 +22,7 @@ module.exports =
             callback: receiveToken
 
       receiveToken = (token) ->
-        # TODO: Work out how to read state in 04
-        #request.setState 'session', auth: token
+        # TODO: ARRRGH! FUCKING STATE!!
         #oAuthToken = token
         request.session.set 'auth', { token }
         eventBroker.publish pubsub.createEvent
@@ -63,14 +62,11 @@ module.exports =
             respond user
 
       respond = (user) ->
-        # TODO: Work out how to read state in 04
+        # TODO: ARRRGH! FUCKING STATE!!
         #request.setState 'session',
         #  user: user.name
         #  auth: oauthToken
         request.session.set 'user', name: user.name
-        #request.session.set 'session',
-        #  user: user.name
-        #  auth: oauthToken
         request.auth.session.set user
         request.reply.redirect '/'
 
