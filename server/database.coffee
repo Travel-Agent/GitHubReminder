@@ -4,7 +4,11 @@ mongo = require 'mongodb'
 pubsub = require 'pub-sub'
 config = require('../config').database
 
-maxRetries = 10
+retryLimit = 5
+collections = [ 'users' ]
+indices =
+  users:
+    name: 1
 
 initialise = ->
   log 'initialising'
@@ -15,64 +19,75 @@ connect = (database) ->
   doAsync database, 'open', [], connected, true
 
 connected = (connection) ->
-  users = eventBroker = undefined
+  collecions = {}
+  eventBroker = undefined
 
   getCollections = ->
     doAsync connection, 'collectionNames', [], receiveCollections, true
 
   receiveCollections = (collectionNames) ->
-    if collectionNames.indexOf "#{connection.name}.users" is -1
-      return createUsersCollection()
+    for collection in collections
+      ensureCollection collection, collectionNames
+    bindEvents
 
-    getUsersCollection()
+  ensureCollection = (name, names) ->
+    if names.indexOf "#{connection.name}.#{name}" is -1
+      return createCollection name
 
-  createUsersCollection = ->
-    doAsync connection, 'createCollection', [ 'users' ], setUsersCollection, true
+    getCollection name
 
-  getUsersCollection = ->
-    doAsync connection, 'collection', [ 'users' ], setUsersCollection, true
+  createCollection = (name) ->
+    doCollectionAction 'createCollection', name
 
-  setUsersCollection = (collection) ->
-    users = collection
-    createUsersIndex()
+  doCollectionAction = (action, name) ->
+    after = (collection) ->
+      setCollection name, collection
+    doAsync connection, action, [ name ], after, true
 
-  createUsersIndex = ->
-    doAsync connection, 'ensureIndex', [ 'users', { name: 1 }, { unique: true, w: 1 } ], bindEvents, true
+  getCollection = (name) ->
+    doCollectionAction 'collection', name
+
+  setCollection = (name, collection) ->
+    collections[name] = collection
+    ensureIndex name
+
+  ensureIndex = (name) ->
+    doAsync connection, 'ensureIndex', [ name, indices[name], { unique: true, w: 1 } ], null, true
 
   bindEvents = ->
     eventBroker = pubsub.getEventBroker 'ghr'
 
     eventBroker.subscribe
-      name: 'db-fetch-user'
-      callback: fetchUser
+      name: 'db-fetch'
+      callback: fetch
     eventBroker.subscribe
-      name: 'db-store-user'
-      callback: storeUser
+      name: 'db-store'
+      callback: store
 
     connection.on 'close', ->
       log 'connection closed'
     connection.on 'open', ->
       log 'connection opened'
 
-  fetchUser = (event) ->
-    doAsync users, 'findOne', [ event.getData() ], event.respond, false
+  fetch = (event) ->
+    data = event.getData()
+    doAsync collections[data.type], 'findOne', [ data.query ], event.respond, false
 
   storeUser = (event) ->
-    doAsync users, 'update', [ event.getData(), { upsert: true, w: 1 } ], event.respond, false
+    data = event.getData()
+    doAsync collections[data.type], 'update', [ data.instance, { upsert: true, w: 1 } ], event.respond, false
 
   getCollections()
-
-log = (message) ->
-  console.log "server/database: #{message}"
 
 doAsync = (object, methodName, args, after, failOnError, retryCount = 0) ->
   log "calling `#{methodName}` with arguments `#{args}`"
 
-  argsAsync = args.slice 0
+  after = after || ->
+  argsCloned = args.slice 0
 
-  argsAsync.push (error, result) ->
+  argsCloned.push (error, result) ->
     if error
-      if retryCount < maxRetries
+      if retryCount < retryLimit
         log "`#{methodName}` returned error `#{error}`"
         return doAsync object, methodName, args, after, failOnError, retryCount + 1
 
@@ -89,7 +104,10 @@ doAsync = (object, methodName, args, after, failOnError, retryCount = 0) ->
 
     after null, result
 
-  object[methodName].apply object, argsAsync
+  object[methodName].apply object, argsCloned
+
+log = (message) ->
+  console.log "server/database: #{message}"
 
 module.exports = { initialise }
 

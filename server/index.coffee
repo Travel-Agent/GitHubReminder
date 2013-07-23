@@ -29,20 +29,9 @@ server = hapi.createServer 'localhost', port,
     appendNext: true
   cache: config.sessions.development
 
-# TODO: Once SSL is set up, pass options for this with isSecure: true
-#server.state 'session',
-#  encoding: 'base64json'
+routes.initialise server
 
-server.pack.allow(ext: true).require 'yar', {
-  password: config.cookies.password
-  isSecure: false # TODO: Investigate SSL, set to true
-}, (error) ->
-  if error
-    console.log "server: error initialising cookies `#{error}`"
-    process.exit 1
+console.log "server: awaiting connections on port #{port}"
 
-  routes.initialise server
-
-  console.log "server: awaiting connections on port #{port}"
-  server.start()
+server.start()
 

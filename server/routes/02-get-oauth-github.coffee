@@ -22,19 +22,20 @@ module.exports =
             callback: receiveToken
 
       receiveToken = (token) ->
-        # TODO: ARRRGH! FUCKING STATE!!
-        #oAuthToken = token
-        request.session.set 'auth', { token }
+        oauthToken = token
         eventBroker.publish pubsub.createEvent
           name: 'gh-get-user'
           data: token
           callback: receiveGhUser
 
       receiveGhUser = (user) ->
+        log 'got gh user'
         eventBroker.publish pubsub.createEvent
-          name: 'db-fetch-user'
+          name: 'db-fetch'
           data:
-            name: user.login
+            type: 'users'
+            query:
+              name: user.login
           callback: (error, dbUser) ->
             receiveDbUser error, dbUser, user.login
 
@@ -52,8 +53,10 @@ module.exports =
           isSaved: false
 
         eventBroker.publish pubsub.createEvent
-          name: 'db-store-user'
-          data: user
+          name: 'db-store'
+          data:
+            type: 'users'
+            instance: user
           callback: (error) ->
             if error
               log "error storing user in database `#{error}`"
@@ -62,12 +65,9 @@ module.exports =
             respond user
 
       respond = (user) ->
-        # TODO: ARRRGH! FUCKING STATE!!
-        #request.setState 'session',
-        #  user: user.name
-        #  auth: oauthToken
-        request.session.set 'user', name: user.name
-        request.auth.session.set user
+        request.auth.session.set
+          user: user.name
+          auth: oauthToken
         request.reply.redirect '/'
 
       getToken()
