@@ -26,7 +26,7 @@ server = hapi.createServer 'localhost', port,
     password: config.cookies.password
     isSecure: false # TODO: Investigate SSL, set to true
     redirectTo: '/signin'
-    appendNext: true
+    appendNext: false
   cache: config.sessions.development
 
 routes.initialise server
