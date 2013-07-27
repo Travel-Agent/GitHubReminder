@@ -19,17 +19,28 @@ module.exports =
           eventBroker.publish pubsub.createEvent
             name: 'gh-get-token'
             data: request.query.code
-            callback: receiveToken
+            callback: (response) ->
+              failOrContinue response, (body) ->
+                oauthToken = body.access_token
+                getGhUser()
 
-      receiveToken = (token) ->
-        oauthToken = token
+      failOrContinue = (response, next) ->
+        if response and response.status is 200
+          return next response.body
+
+        fail()
+
+      fail = ->
+        # TODO: render error view
+
+      getGhUser = ->
         eventBroker.publish pubsub.createEvent
           name: 'gh-get-user'
-          data: token
-          callback: receiveGhUser
+          data: oauthToken
+          callback: (response) ->
+            failOrContinue response, getDbUser
 
-      receiveGhUser = (user) ->
-        log 'got gh user'
+      getDbUser = (user) ->
         eventBroker.publish pubsub.createEvent
           name: 'db-fetch'
           data:
@@ -45,7 +56,7 @@ module.exports =
 
         if error
           log "error fetching user from database `#{error}`"
-          # TODO: Fail
+          return fail()
 
         user =
           name: name
@@ -56,11 +67,13 @@ module.exports =
           name: 'db-store'
           data:
             type: 'users'
+            query:
+              name: user.name
             instance: user
           callback: (error) ->
             if error
               log "error storing user in database `#{error}`"
-              # TODO: Fail
+              fail()
 
             respond user
 

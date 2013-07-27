@@ -75,12 +75,13 @@ connected = (connection) ->
 
   store = (event) ->
     data = event.getData()
-    doAsync collections[data.type], 'update', [ data.instance, { upsert: true, w: 1 } ], event.respond, false
+    doAsync collections[data.type], 'update', [ data.query, data.instance, { upsert: true, w: 1 } ], event.respond, false
 
   getCollections()
 
 doAsync = (object, methodName, args, after, failOnError, retryCount = 0) ->
   log "calling `#{methodName}` with arguments `#{args}`"
+  console.dir args
 
   after = after || ->
   argsCloned = args.slice 0

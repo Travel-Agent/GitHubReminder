@@ -27,22 +27,23 @@ getToken = (event) ->
     headers:
       'User-Agent': userAgent
       'Accept': 'application/json'
-  }, "client_id=#{config.id}&client_secret=#{config.secret}&code=#{event.getData()}", (response) ->
-    event.respond response.access_token
+  }, "client_id=#{config.id}&client_secret=#{config.secret}&code=#{event.getData()}", event.respond
 
 request = (what, options, data, callback) ->
   log "requesting #{what} from `#{options.path}`"
   req = https.request options, (response) ->
-    if response.statusCode is 200
-      log "got #{what} response"
+    log "got #{what} response"
 
-      body = ''
+    body = ''
 
-      response.on 'readable', ->
-        body += response.read()
+    response.on 'readable', ->
+      body += response.read()
 
-      response.on 'end', ->
-        callback response.headers, JSON.parse body
+    response.on 'end', ->
+      callback
+        status: response.statusCode
+        headers: response.headers
+        body: JSON.parse body
 
   if data
     log "writing data `#{data}`"
@@ -71,11 +72,7 @@ getEmail = (event) ->
     headers:
       'User-Agent': userAgent
       'Accept': 'application/vnd.github.v3+json'
-  }, null, (response) ->
-    event.respond response.filter((email) ->
-      email.verified is true
-    ).map (email) ->
-      email.email
+  }, null, event.respond
 
 getRecentStarredRepositories = (event) ->
   getStars event.getData(), 'created', 'desc', 5, false, event.respond
@@ -90,13 +87,14 @@ getStars = (oauthToken, sort, direction, count, getAll, callback, results = [], 
     method: 'GET'
     headers:
       'User-Agent': userAgent
-  }, null, (headers, body) ->
-    results = results.concat body
-    links = parsePaginationLinks headers.link
-    if getAll and check.isUnemptyString links.next
-      return getStars '', '', '', '', true, callback, results, links.next.substr links.indexOf(host) + host.length
+  }, null, (response) ->
+    if response.status is 200
+      response.body = results.concat response.body
+      links = parsePaginationLinks response.headers.link
+      if getAll and check.isUnemptyString links.next
+        return getStars '', '', '', '', true, callback, response.body, links.next.substr links.indexOf(host) + host.length
 
-    callback results
+    callback response
 
 parsePaginationLinks = (links) ->
   if check.isUnemptyString links

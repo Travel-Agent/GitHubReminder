@@ -11,9 +11,13 @@ module.exports =
       currentUser = currentEmails = currentStars = undefined
       outstandingRequests = 3
 
-      # TODO: Sane error handling
+      begin = ->
+        getUser()
+        getEmails()
+        getRecentStars()
 
       getUser = ->
+        log "getting user #{request.state.sid.user}"
         eventBroker.publish pubsub.createEvent
           name: 'db-fetch'
           data:
@@ -23,30 +27,50 @@ module.exports =
           callback: (error, user) ->
             if error
               log "error fetching user from database `#{error}`"
-              # TODO: Fail
+              return fail()
+
+            log "got user #{user}"
 
             currentUser = user
             after()
 
+      fail = ->
+        log 'failing'
+        outstandingRequests = -1
+        # TODO: Render error view
+
       after = ->
         outstandingRequests -= 1
-        if oustandingRequests is 0
+        log "#{outstandingRequests} outstanding requests"
+        if outstandingRequests is 0
           respond()
 
       getEmails = (user) ->
         eventBroker.publish pubsub.createEvent
           name: 'gh-get-email'
           data: request.state.sid.auth
-          callback: (emails) ->
-            currentEmails = emails
+          callback: (response) ->
+            log "email status is #{response.status}"
+            unless response.status is 200
+              return fail()
+
+            currentEmails = response.body.filter((email) ->
+              email.verified is true
+            ).map (email) ->
+              email.email
+
             after()
 
       getRecentStars = ->
         eventBroker.publish pubsub.createEvent
           name: 'gh-get-starred-recent'
           data: request.state.sid.auth
-          callback: (stars) ->
-            currentStars = stars
+          callback: (response) ->
+            log "stars status is #{response.status}"
+            unless response.status is 200
+              return fail()
+
+            currentStars = response.body
             after()
 
       respond = ->
@@ -59,7 +83,7 @@ module.exports =
           isMonthly: currentUser.frequency is 'monthly'
           isSaved: currentUser.isSaved
 
-      getRecentStars()
+      begin()
 
     auth: true
 
