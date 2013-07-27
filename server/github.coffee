@@ -36,10 +36,13 @@ request = (what, options, data, callback) ->
     if response.statusCode is 200
       log "got #{what} response"
 
+      body = ''
+
       response.on 'readable', ->
-        data = response.read()
-        log "received #{typeof data} data `#{data}`"
-        callback JSON.parse data
+        body += response.read()
+
+      response.on 'end', ->
+        callback response.headers, JSON.parse body
 
   if data
     log "writing data `#{data}`"
@@ -87,9 +90,9 @@ getStars = (oauthToken, sort, direction, count, getAll, callback, results = [], 
     method: 'GET'
     headers:
       'User-Agent': userAgent
-  }, null, (response) ->
-    results = results.concat response
-    links = parsePaginationLinks response.headers.link
+  }, null, (headers, body) ->
+    results = results.concat body
+    links = parsePaginationLinks headers.link
     if getAll and check.isUnemptyString links.next
       return getStars '', '', '', '', true, callback, results, links.next.substr links.indexOf(host) + host.length
 
