@@ -13,11 +13,11 @@
     {{#each repos}}
     <li>
       <a href="{{html_url}}">
-      <h3>{{full_name}}</h3>
+        <h3>{{full_name}}</h3>
 
-      <p>{{description}}<p>
+        <p>{{description}}<p>
 
-      <ul>
+        <ul>
           <li>
             <h4>Stars</h4>:
             {{watchers_count}}
@@ -32,7 +32,8 @@
             <h4>Language</h4>:
             {{language}}
           </li>
-        </a>
+        </ul>
+      </a>
     </li>
     {{/each}}
   </ul>
