@@ -81,7 +81,6 @@ connected = (connection) ->
 
 doAsync = (object, methodName, args, after, failOnError, retryCount = 0) ->
   log "calling `#{methodName}` with arguments `#{args}`"
-  console.dir args
 
   after = after || ->
   argsCloned = args.slice 0

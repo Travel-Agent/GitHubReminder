@@ -1,0 +1,21 @@
+{{#partial 'title'}}Error{{/partial}}
+{{#partial 'content'}}
+<section>
+  <h2>Whoopsie!</h2>
+
+  <!-- TODO: Add form for creating an issue via the GitHub API -->
+
+  <p>
+    Something went wrong.
+    Please create a
+    <a href="https://github.com/philbooth/GitHubReminder/issues/new">new issue</a>
+    on GitHub
+    and paste the following error message
+    into the description.
+  </p>
+
+  <p class="error">
+    {{errorMessage}}
+  </p>
+{{/partial}}
+{{> layout}}

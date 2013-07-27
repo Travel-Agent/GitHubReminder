@@ -28,10 +28,11 @@ module.exports =
         if response and response.status is 200
           return next response.body
 
-        fail()
+        fail "Received #{response.status} response from `#{response.origin}`"
 
-      fail = ->
-        # TODO: render error view
+      fail = (error) ->
+        request.reply.view 'content/error.html',
+          error: "server/routes/02: #{error}"
 
       getGhUser = ->
         eventBroker.publish pubsub.createEvent
@@ -55,14 +56,17 @@ module.exports =
           return respond user
 
         if error
-          log "error fetching user from database `#{error}`"
-          return fail()
+          return databaseFail 'fetch user', error
 
-        user =
+        storeDbUser
           name: name
           frequency: 'weekly'
           isSaved: false
 
+      databaseFail = (operation, error) ->
+        fail "Failed to #{operation}, reason `#{error}`"
+
+      storeDbUser = (user) ->
         eventBroker.publish pubsub.createEvent
           name: 'db-store'
           data:
@@ -72,8 +76,7 @@ module.exports =
             instance: user
           callback: (error) ->
             if error
-              log "error storing user in database `#{error}`"
-              fail()
+              return databaseFail 'store user', error
 
             respond user
 
@@ -87,7 +90,4 @@ module.exports =
 
     auth:
       mode: 'try'
-
-log = (message) ->
-  console.log "server/routes/02: #{message}"
 

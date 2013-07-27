@@ -17,7 +17,6 @@ module.exports =
         getRecentStars()
 
       getUser = ->
-        log "getting user #{request.state.sid.user}"
         eventBroker.publish pubsub.createEvent
           name: 'db-fetch'
           data:
@@ -26,22 +25,18 @@ module.exports =
               name: request.state.sid.user
           callback: (error, user) ->
             if error
-              log "error fetching user from database `#{error}`"
-              return fail()
-
-            log "got user #{user}"
+              return fail "Failed to fetch user from database, reason `#{error}`"
 
             currentUser = user
             after()
 
-      fail = ->
-        log 'failing'
+      fail = (error) ->
         outstandingRequests = -1
-        # TODO: Render error view
+        request.reply.view 'content/error.html',
+          error: "server/routes/04: #{error}"
 
       after = ->
         outstandingRequests -= 1
-        log "#{outstandingRequests} outstanding requests"
         if outstandingRequests is 0
           respond()
 
@@ -50,9 +45,8 @@ module.exports =
           name: 'gh-get-email'
           data: request.state.sid.auth
           callback: (response) ->
-            log "email status is #{response.status}"
             unless response.status is 200
-              return fail()
+              return responseFail response
 
             currentEmails = response.body.filter((email) ->
               email.verified is true
@@ -61,14 +55,16 @@ module.exports =
 
             after()
 
+      responseFail = (response) ->
+        fail "Received #{response.status} response from `#{response.origin}`"
+
       getRecentStars = ->
         eventBroker.publish pubsub.createEvent
           name: 'gh-get-starred-recent'
           data: request.state.sid.auth
           callback: (response) ->
-            log "stars status is #{response.status}"
             unless response.status is 200
-              return fail()
+              return responseFail response
 
             currentStars = response.body
             after()
@@ -86,7 +82,4 @@ module.exports =
       begin()
 
     auth: true
-
-log = (message) ->
-  console.log "server/routes/04: #{message}"
 

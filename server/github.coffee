@@ -40,8 +40,11 @@ request = (what, options, data, callback) ->
       body += response.read()
 
     response.on 'end', ->
+      originIndex = options.path.indexOf '?'
+      origin = if originIndex is -1 then options.path else options.path.substring 0, originIndex
       callback
         status: response.statusCode
+        origin: origin
         headers: response.headers
         body: JSON.parse body
 
