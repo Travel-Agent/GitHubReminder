@@ -28,7 +28,7 @@ connected = (connection) ->
   receiveCollections = (collectionNames) ->
     for collection in collections
       ensureCollection collection, collectionNames
-    bindEvents
+    bindEvents()
 
   ensureCollection = (name, names) ->
     if names.indexOf "#{connection.name}.#{name}" is -1
@@ -73,7 +73,7 @@ connected = (connection) ->
     data = event.getData()
     doAsync collections[data.type], 'findOne', [ data.query ], event.respond, false
 
-  storeUser = (event) ->
+  store = (event) ->
     data = event.getData()
     doAsync collections[data.type], 'update', [ data.instance, { upsert: true, w: 1 } ], event.respond, false
 
