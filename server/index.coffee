@@ -1,3 +1,5 @@
+'use strict'
+
 coffee = require 'coffee-script-redux'
 coffee.register()
 
