@@ -72,7 +72,8 @@ module.exports =
       respond = ->
         request.reply.view 'content/index.html',
           user: currentUser.name
-          emails: currentEmails
+          avatar: currentUser.avatar
+          email: currentEmails
           repos: currentStars
           isDaily: currentUser.frequency is 'daily'
           isWeekly: currentUser.frequency is 'weekly'

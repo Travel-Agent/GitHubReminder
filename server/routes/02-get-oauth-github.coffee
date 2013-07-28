@@ -49,9 +49,9 @@ module.exports =
             query:
               name: user.login
           callback: (error, dbUser) ->
-            receiveDbUser error, dbUser, user.login
+            receiveDbUser error, dbUser, user.login, user.avatar_url
 
-      receiveDbUser = (error, user, name) ->
+      receiveDbUser = (error, user, name, avatar) ->
         if check.isObject user
           return respond user
 
@@ -60,6 +60,8 @@ module.exports =
 
         storeDbUser
           name: name
+          avatar: avatar
+          auth: oauthToken
           frequency: 'weekly'
           isSaved: false
 
