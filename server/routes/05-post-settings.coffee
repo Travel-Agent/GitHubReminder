@@ -17,6 +17,7 @@ module.exports =
         otherEmail: types.String().email().emptyOk()
         frequency: types.String().valid 'daily', 'weekly', 'monthly'
     handler: (request) ->
+      # TODO: Verify other email address
       if request.payload.email is 'other'
         if request.payload.otherEmail is ''
           return request.reply.redirect '/?saved=no&reason=otherEmail'
