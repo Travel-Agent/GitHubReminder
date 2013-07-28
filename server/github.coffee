@@ -68,7 +68,7 @@ request = (what, options, data, callback) ->
         status: response.statusCode
         origin: origin
         headers: response.headers
-        body: JSON.parse body
+        body: if response.status is 200 then JSON.parse body else body
 
   if data
     log "writing data `#{data}`"
