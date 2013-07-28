@@ -57,13 +57,12 @@ connected = (connection) ->
   bindEvents = ->
     eventBroker = pubsub.getEventBroker 'ghr'
 
-    eventBroker.subscribe
-      name: 'db-fetch'
-      callback: fetch
-    eventBroker.subscribe
-      name: 'db-store'
-      callback: store
+    for own eventName, eventHandler of eventHandlers
+      eventBroker.subscribe
+        name: eventName
+        callback: eventHandler
 
+    # TODO: Do I need to maintain state here and check for an open connection before running queries?
     connection.on 'close', ->
       log 'connection closed'
     connection.on 'open', ->
@@ -73,9 +72,18 @@ connected = (connection) ->
     data = event.getData()
     doAsync collections[data.type], 'findOne', [ data.query ], event.respond, false
 
-  store = (event) ->
+  insert = (event) ->
     data = event.getData()
-    doAsync collections[data.type], 'update', [ data.query, data.instance, { upsert: true, w: 1 } ], event.respond, false
+    doAsync collections[data.type], 'insert', [ data.instance, { w: 1 } ], event.respond, false
+
+  update = (event) ->
+    data = event.getData()
+    doAsync collections[data.type], 'update', [ data.query, { $set: data.instance }, { w: 1 } ], event.respond, false
+
+  eventHandlers =
+    'db-fetch': fetch
+    'db-insert': insert
+    'db-update': update
 
   getCollections()
 

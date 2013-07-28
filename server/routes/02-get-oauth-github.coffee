@@ -2,7 +2,7 @@
 
 pubsub = require 'pub-sub'
 check = require 'check-types'
-config = require('../../config').oauth.development
+config = require('../../config').oauth[process.env.NODE_ENV || 'development']
 
 eventBroker = pubsub.getEventBroker 'ghr'
 
@@ -10,6 +10,8 @@ module.exports =
   path: config.route
   method: 'GET'
   config:
+    auth:
+      mode: 'try'
     handler: (request) ->
       # TODO: Sane error handling
       oauthToken = undefined
@@ -70,11 +72,9 @@ module.exports =
 
       storeDbUser = (user) ->
         eventBroker.publish pubsub.createEvent
-          name: 'db-store'
+          name: 'db-insert'
           data:
             type: 'users'
-            query:
-              name: user.name
             instance: user
           callback: (error) ->
             if error
@@ -89,7 +89,4 @@ module.exports =
         request.reply.redirect '/'
 
       getToken()
-
-    auth:
-      mode: 'try'
 

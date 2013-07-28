@@ -1,5 +1,6 @@
 'use strict'
 
+check = require 'check-types'
 pubsub = require 'pub-sub'
 eventBroker = pubsub.getEventBroker 'ghr'
 
@@ -7,6 +8,7 @@ module.exports =
   path: '/'
   method: 'GET'
   config:
+    auth: true
     handler: (request) ->
       currentUser = currentEmails = currentStars = undefined
       outstandingRequests = 3
@@ -51,7 +53,8 @@ module.exports =
             currentEmails = response.body.filter((email) ->
               email.verified is true
             ).map (email) ->
-              email.email
+              address: email.email
+              isSelected: currentUser.email is email.email
 
             after()
 
@@ -70,10 +73,14 @@ module.exports =
             after()
 
       respond = ->
+        isOtherEmail = currentUser.isSaved and currentEmails.every (email) ->
+          email.isSelected is false
         request.reply.view 'content/index.html',
           user: currentUser.name
           avatar: currentUser.avatar
           email: currentEmails
+          isOtherEmail: isOtherEmail
+          otherEmail: if isOtherEmail then currentUser.email else ''
           repos: currentStars
           isDaily: currentUser.frequency is 'daily'
           isWeekly: currentUser.frequency is 'weekly'
@@ -81,6 +88,4 @@ module.exports =
           isSaved: currentUser.isSaved
 
       begin()
-
-    auth: true
 
