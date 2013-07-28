@@ -1,8 +1,8 @@
 'use strict'
 
 mongo = require 'mongodb'
-pubsub = require 'pub-sub'
-config = require('../config').database
+eventBroker = require './eventBroker'
+config = require('../config').database[process.env.NODE_ENV || 'development']
 
 retryLimit = 5
 collections = [ 'users' ]
@@ -12,15 +12,14 @@ indices =
 
 initialise = ->
   log 'initialising'
-  server = new mongo.Server config.development.host, config.development.port, auto_reconnect: true
-  connect new mongo.Db config.development.name, server, w: 1
+  server = new mongo.Server config.host, config.port, auto_reconnect: true
+  connect new mongo.Db config.name, server, w: 1
 
 connect = (database) ->
   doAsync database, 'open', [], connected, true
 
 connected = (connection) ->
   collecions = {}
-  eventBroker = undefined
 
   getCollections = ->
     doAsync connection, 'collectionNames', [], receiveCollections, true
@@ -55,12 +54,7 @@ connected = (connection) ->
     doAsync connection, 'ensureIndex', [ name, indices[name], { unique: true, w: 1 } ], null, true
 
   bindEvents = ->
-    eventBroker = pubsub.getEventBroker 'ghr'
-
-    for own eventName, eventHandler of eventHandlers
-      eventBroker.subscribe
-        name: eventName
-        callback: eventHandler
+    eventBroker.subscribe 'database', eventHandlers
 
     # TODO: Do I need to maintain state here and check for an open connection before running queries?
     connection.on 'close', ->
@@ -68,22 +62,18 @@ connected = (connection) ->
     connection.on 'open', ->
       log 'connection opened'
 
-  fetch = (event) ->
-    data = event.getData()
-    doAsync collections[data.type], 'findOne', [ data.query ], event.respond, false
-
-  insert = (event) ->
-    data = event.getData()
-    doAsync collections[data.type], 'insert', [ data.instance, { w: 1 } ], event.respond, false
-
-  update = (event) ->
-    data = event.getData()
-    doAsync collections[data.type], 'update', [ data.query, { $set: data.instance }, { w: 1 } ], event.respond, false
-
   eventHandlers =
-    'db-fetch': fetch
-    'db-insert': insert
-    'db-update': update
+    fetch: (event) ->
+      data = event.getData()
+      doAsync collections[data.type], 'findOne', [ data.query ], event.respond, false
+
+    insert: (event) ->
+      data = event.getData()
+      doAsync collections[data.type], 'insert', [ data.instance, { w: 1 } ], event.respond, false
+
+    update: (event) ->
+      data = event.getData()
+      doAsync collections[data.type], 'update', [ data.query, { $set: data.instance }, { w: 1 } ], event.respond, false
 
   getCollections()
 

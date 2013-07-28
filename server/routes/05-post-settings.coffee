@@ -1,8 +1,8 @@
 'use strict'
 
 { types } = require 'hapi'
-pubsub = require 'pub-sub'
-eventBroker = pubsub.getEventBroker 'ghr'
+events = require '../events'
+eventBroker = require '../eventBroker'
 
 module.exports =
   path: '/settings'
@@ -26,20 +26,17 @@ module.exports =
       else
         emailType = 'email'
 
-      eventBroker.publish pubsub.createEvent
-        name: 'db-update'
-        data:
-          type: 'users'
-          query:
-            name: request.state.sid.user
-          instance:
-            email: request.payload[emailType]
-            frequency: request.payload.frequency
-            isSaved: true
-        callback: (error) ->
-          if error
-            return request.reply.view 'content/error.html',
-              error: "server/routes/05: Failed to update user, reason `#{error}`"
-
-          request.reply.redirect '/?saved=yes'
+      eventBroker.publish events.database.update, {
+        type: 'users'
+        query:
+          name: request.state.sid.user
+        instance:
+          email: request.payload[emailType]
+          frequency: request.payload.frequency
+          isSaved: true
+      }, (error) ->
+        if error
+          return request.reply.view 'content/error.html',
+            error: "server/routes/05: Failed to update user, reason `#{error}`"
+        request.reply.redirect '/?saved=yes'
 

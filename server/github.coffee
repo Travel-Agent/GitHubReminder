@@ -2,32 +2,54 @@
 
 https = require 'https'
 check = require 'check-types'
-
-pubsub = require 'pub-sub'
-eventBroker = pubsub.getEventBroker 'ghr'
+eventBroker = require './eventBroker'
 
 packageInfo = require '../package.json'
 userAgent = "#{packageInfo.name}/#{packageInfo.version} (node.js/#{process.version})"
 
-config = require('../config').oauth.development
+config = require('../config').oauth[process.env.NODE_ENV || 'development']
 
 host = 'api.github.com'
 
 initialise = ->
-  for own eventName, eventHandler of eventHandlers
-    eventBroker.subscribe
-      name: eventName
-      callback: eventHandler
+  eventBroker.subscribe 'github', eventHandlers
 
-getToken = (event) ->
-  request 'access token', {
-    host: 'github.com'
-    path: '/login/oauth/access_token'
-    method: 'POST'
-    headers:
-      'User-Agent': userAgent
-      'Accept': 'application/json'
-  }, "client_id=#{config.id}&client_secret=#{config.secret}&code=#{event.getData()}", event.respond
+eventHandlers =
+  getToken: (event) ->
+    request 'access token', {
+      host: 'github.com'
+      path: '/login/oauth/access_token'
+      method: 'POST'
+      headers:
+        'User-Agent': userAgent
+        'Accept': 'application/json'
+    }, "client_id=#{config.id}&client_secret=#{config.secret}&code=#{event.getData()}", event.respond
+
+  getUser: (event) ->
+    request 'user', {
+      host: host
+      path: "/user?access_token=#{event.getData()}"
+      method: 'GET'
+      headers:
+        'User-Agent': userAgent
+        'Accept': 'application/json'
+    }, null, event.respond
+
+  getEmail: (event) ->
+    request 'email', {
+      host: host
+      path: "/user/emails?access_token=#{event.getData()}"
+      method: 'GET'
+      headers:
+        'User-Agent': userAgent
+        'Accept': 'application/vnd.github.v3+json'
+    }, null, event.respond
+
+  getStarredRecent: (event) ->
+    getStarred event.getData(), 'created', 'desc', 5, false, event.respond
+
+  getStarredAll: (event) ->
+    getStarred event.getData(), 'created', 'asc', 100, true, event.respond
 
 request = (what, options, data, callback) ->
   log "requesting #{what} from `#{options.path}`"
@@ -57,33 +79,7 @@ request = (what, options, data, callback) ->
 log = (message) ->
   console.log "server/github: #{message}"
 
-getUser = (event) ->
-  request 'user', {
-    host: host
-    path: "/user?access_token=#{event.getData()}"
-    method: 'GET'
-    headers:
-      'User-Agent': userAgent
-      'Accept': 'application/json'
-  }, null, event.respond
-
-getEmail = (event) ->
-  request 'email', {
-    host: host
-    path: "/user/emails?access_token=#{event.getData()}"
-    method: 'GET'
-    headers:
-      'User-Agent': userAgent
-      'Accept': 'application/vnd.github.v3+json'
-  }, null, event.respond
-
-getRecentStarredRepositories = (event) ->
-  getStars event.getData(), 'created', 'desc', 5, false, event.respond
-
-getAllStarredRepositories = (event) ->
-  getStars event.getData(), 'created', 'asc', 100, true, event.respond
-
-getStars = (oauthToken, sort, direction, count, getAll, callback, results = [], path = '') ->
+getStarred = (oauthToken, sort, direction, count, getAll, callback, results = [], path = '') ->
   request 'stars', {
     host: host
     path: path || "/user/starred?access_token=#{oauthToken}&sort=#{sort}&direction=#{direction}&per_page=#{count}"
@@ -95,7 +91,7 @@ getStars = (oauthToken, sort, direction, count, getAll, callback, results = [], 
       response.body = results.concat response.body
       links = parsePaginationLinks response.headers.link
       if getAll and check.isUnemptyString links.next
-        return getStars '', '', '', '', true, callback, response.body, links.next.substr links.indexOf(host) + host.length
+        return getStarred '', '', '', '', true, callback, response.body, links.next.substr links.indexOf(host) + host.length
 
     callback response
 
@@ -115,13 +111,6 @@ parsePaginationLink = (link) ->
 combinePaginationLinks = (link, result) ->
   result[link.key] = link.url
   result
-
-eventHandlers =
-  'gh-get-token': getToken
-  'gh-get-user': getUser
-  'gh-get-email': getEmail
-  'gh-get-starred-recent': getRecentStarredRepositories
-  'gh-get-starred-all': getAllStarredRepositories
 
 module.exports = { initialise }
 

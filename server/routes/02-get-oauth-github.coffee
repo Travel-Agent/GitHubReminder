@@ -2,9 +2,9 @@
 
 pubsub = require 'pub-sub'
 check = require 'check-types'
+events = require '../events'
+eventBroker = require '../eventBroker'
 config = require('../../config').oauth[process.env.NODE_ENV || 'development']
-
-eventBroker = pubsub.getEventBroker 'ghr'
 
 module.exports =
   path: config.route
@@ -13,18 +13,14 @@ module.exports =
     auth:
       mode: 'try'
     handler: (request) ->
-      # TODO: Sane error handling
       oauthToken = undefined
 
       getToken = ->
         if request.query.state is config.state
-          eventBroker.publish pubsub.createEvent
-            name: 'gh-get-token'
-            data: request.query.code
-            callback: (response) ->
-              failOrContinue response, (body) ->
-                oauthToken = body.access_token
-                getGhUser()
+          eventBroker.publish events.github.getToken, request.query.code, (response) ->
+            failOrContinue response, (body) ->
+              oauthToken = body.access_token
+              getGhUser()
 
       failOrContinue = (response, next) ->
         if response and response.status is 200
@@ -37,21 +33,12 @@ module.exports =
           error: "server/routes/02: #{error}"
 
       getGhUser = ->
-        eventBroker.publish pubsub.createEvent
-          name: 'gh-get-user'
-          data: oauthToken
-          callback: (response) ->
-            failOrContinue response, getDbUser
+        eventBroker.publish events.github.getUser, oauthToken, (response) ->
+          failOrContinue response, getDbUser
 
       getDbUser = (user) ->
-        eventBroker.publish pubsub.createEvent
-          name: 'db-fetch'
-          data:
-            type: 'users'
-            query:
-              name: user.login
-          callback: (error, dbUser) ->
-            receiveDbUser error, dbUser, user.login, user.avatar_url
+        eventBroker.publish events.database.fetch, { type: 'users', query: { name: user.login } }, (error, dbUser) ->
+          receiveDbUser error, dbUser, user.login, user.avatar_url
 
       receiveDbUser = (error, user, name, avatar) ->
         if check.isObject user
@@ -71,16 +58,10 @@ module.exports =
         fail "Failed to #{operation}, reason `#{error}`"
 
       storeDbUser = (user) ->
-        eventBroker.publish pubsub.createEvent
-          name: 'db-insert'
-          data:
-            type: 'users'
-            instance: user
-          callback: (error) ->
-            if error
-              return databaseFail 'store user', error
-
-            respond user
+        eventBroker.publish events.database.insert, { type: 'users', instance: user }, (error) ->
+          if error
+            return databaseFail 'store user', error
+          respond user
 
       respond = (user) ->
         request.auth.session.set
