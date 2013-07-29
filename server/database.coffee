@@ -4,16 +4,18 @@ mongo = require 'mongodb'
 eventBroker = require './eventBroker'
 config = require('../config').database[process.env.NODE_ENV || 'development']
 
-retryLimit = 5
+retryLimit = 3
 collections = [ 'users' ]
 indices =
-  users:
-    name: 1
+  users: [ { spec: { name: 1 }, isUnique: 1 }, { spec: { job: 1 } } ]
 
 initialise = ->
   log 'initialising'
   server = new mongo.Server config.host, config.port, auto_reconnect: true
   connect new mongo.Db config.name, server, w: 1
+
+log = (message) ->
+  console.log "server/database: #{message}"
 
 connect = (database) ->
   doAsync database, 'open', [], connected, true
@@ -48,10 +50,14 @@ connected = (connection) ->
 
   setCollection = (name, collection) ->
     collections[name] = collection
-    ensureIndex name
+    ensureIndices name
 
-  ensureIndex = (name) ->
-    doAsync connection, 'ensureIndex', [ name, indices[name], { unique: true, w: 1 } ], null, true
+  ensureIndices = (collectionName)
+    indices.collectionName.forEach (index) ->
+      ensureIndex index.spec, index.isUnique
+
+  ensureIndex = (spec, isUnique) ->
+    doAsync connection, 'ensureIndex', [ spec, { unique: isUnique, w: 1 } ], null, true
 
   bindEvents = ->
     eventBroker.subscribe 'database', eventHandlers
@@ -66,6 +72,10 @@ connected = (connection) ->
     fetch: (event) ->
       data = event.getData()
       doAsync collections[data.type], 'findOne', [ data.query ], event.respond, false
+
+    fetchAll: (event) ->
+      data = event.getData()
+      doAsync collections[data.type], 'find', [ data.query ], event.respond, false
 
     insert: (event) ->
       data = event.getData()
@@ -103,9 +113,6 @@ doAsync = (object, methodName, args, after, failOnError, retryCount = 0) ->
     after null, result
 
   object[methodName].apply object, argsCloned
-
-log = (message) ->
-  console.log "server/database: #{message}"
 
 module.exports = { initialise }
 
