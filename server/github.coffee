@@ -68,7 +68,7 @@ request = (what, options, data, callback) ->
         status: response.statusCode
         origin: origin
         headers: response.headers
-        body: if response.status is 200 then JSON.parse body else body
+        body: if response.statusCode is 200 then JSON.parse body else body
 
   if data
     log "writing data `#{data}`"
@@ -91,7 +91,8 @@ getStarred = (oauthToken, sort, direction, count, getAll, callback, results = []
       response.body = results.concat response.body
       links = parsePaginationLinks response.headers.link
       if getAll and check.isUnemptyString links.next
-        return getStarred '', '', '', '', true, callback, response.body, links.next.substr links.indexOf(host) + host.length
+        # TODO: Consider discounting recently starred repos
+        return getStarred '', '', '', '', true, callback, response.body, links.next.substr links.next.indexOf(host) + host.length
 
     callback response
 

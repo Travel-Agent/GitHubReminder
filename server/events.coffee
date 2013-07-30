@@ -8,6 +8,7 @@ events =
   github: [ 'get-token', 'get-user', 'get-email', 'get-starred-recent', 'get-starred-all' ]
   database: [ 'fetch', 'fetch-all', 'insert', 'update' ]
   jobs: [ 'generate', 'force' ]
+  email: [ 'send-reminder', 'send-error' ]
 
 getEventMap = ->
   result = {}

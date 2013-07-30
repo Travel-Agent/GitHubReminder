@@ -63,3 +63,5 @@ module.exports =
 
         request.reply.redirect '/?saved=yes'
 
+      verifyEmail()
+

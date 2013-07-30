@@ -3,14 +3,9 @@
 coffee = require 'coffee-script-redux'
 coffee.register()
 
-database = require './database'
-database.initialise()
-
-github = require './github'
-github.initialise()
-
-templates = require './templates'
-templates.initialise()
+modules = [ 'templates', 'database', 'github', 'jobs', 'email' ]
+modules.forEach (m) ->
+  require("./#{m}").initialise()
 
 hapi = require 'hapi'
 config = require '../config'

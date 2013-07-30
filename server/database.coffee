@@ -52,8 +52,8 @@ connected = (connection) ->
     collections[name] = collection
     ensureIndices name
 
-  ensureIndices = (collectionName)
-    indices.collectionName.forEach (index) ->
+  ensureIndices = (collectionName) ->
+    indices[collectionName].forEach (index) ->
       ensureIndex index.spec, index.isUnique
 
   ensureIndex = (spec, isUnique) ->
