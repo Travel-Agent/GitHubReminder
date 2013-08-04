@@ -1,7 +1,6 @@
 'use strict'
 
-coffee = require 'coffee-script-redux'
-coffee.register()
+coffee = require 'coffee-script'
 
 modules = [ 'templates', 'database', 'github', 'jobs', 'email' ]
 modules.forEach (m) ->

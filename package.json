@@ -8,11 +8,11 @@
   ],
   "main": "./server",
   "scripts": {
-      "build": "./node_modules/.bin/coffee --js --no-optimise --input server/index.coffee --output server/index.js",
+      "build": "./node_modules/.bin/coffee -c --output server server/index.coffee",
       "start": "node server"
   },
   "dependencies": {
-    "coffee-script-redux": "2.0.x",
+    "coffee-script": "1.6.x",
     "hapi": "1.9.x",
     "handlebars": "1.0.x",
     "mongodb": "1.3.x",
