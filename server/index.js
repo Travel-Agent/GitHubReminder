@@ -17,9 +17,9 @@
 
   routes = require('./routes');
 
-  port = process.env.PORT || 8080;
+  port = process.env.NODE_PORT || 8080;
 
-  server = hapi.createServer('localhost', port, {
+  server = hapi.createServer(process.env.NODE_HOST || 'localhost', port, {
     views: {
       path: 'views',
       engines: {
@@ -33,7 +33,7 @@
       redirectTo: '/signin',
       appendNext: false
     },
-    cache: config.sessions.development
+    cache: config.sessions[process.env.NODE_ENV || 'development']
   });
 
   routes.initialise(server);
