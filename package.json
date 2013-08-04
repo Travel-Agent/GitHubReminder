@@ -8,6 +8,7 @@
   ],
   "main": "./server",
   "scripts": {
+      "build": "./node_modules/.bin/coffee --js --no-optimise --input server/index.coffee --output server/index.js",
       "start": "node server"
   },
   "dependencies": {

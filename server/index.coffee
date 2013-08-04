@@ -11,7 +11,7 @@ hapi = require 'hapi'
 config = require '../config'
 routes = require './routes'
 
-port = 8080
+port = process.env.PORT || 8080
 
 server = hapi.createServer 'localhost', port,
   views:
