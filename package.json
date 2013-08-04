@@ -6,8 +6,9 @@
   "contributors": [
     { "name": "Phil Booth", "email": "pmbooth@gmail.com" }
   ],
+  "main": "./server",
   "scripts": {
-      "start": "./node_modules/.bin/coffee server/index.coffee"
+      "start": "node server"
   },
   "dependencies": {
     "coffee-script-redux": "2.0.x",
