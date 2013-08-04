@@ -21,8 +21,8 @@ connect = (database) ->
   doAsync database, 'open', [], connected, true
 
 connected = (connection, authenticate = true) ->
-  if authenticate is true config.username and config.password
-    return doAsync, 'authenticate', [ config.username, config.password ], (result) ->
+  if authenticate is true and config.username and config.password
+    return doAsync 'authenticate', [ config.username, config.password ], (result) ->
       if result is false
         log 'Failed to authenticate database credentials'
         return process.exit 1
