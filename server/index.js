@@ -17,9 +17,9 @@
 
   routes = require('./routes');
 
-  port = parseInt(process.env.NODE_PORT || '8080');
+  port = parseInt(process.env.PORT || '8080');
 
-  server = hapi.createServer(process.env.NODE_HOST || 'localhost', port, {
+  server = hapi.createServer(process.env.HOST || 'localhost', port, {
     views: {
       path: 'views',
       engines: {
