@@ -1,5 +1,7 @@
 'use strict'
 
+console.log "$PORT is `#{process.env.PORT}`"
+
 coffee = require 'coffee-script'
 
 modules = [ 'templates', 'database', 'github', 'jobs', 'email' ]
