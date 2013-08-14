@@ -21,13 +21,11 @@ connect = (database) ->
   doAsync database, 'open', [], connected, true
 
 connected = (connection, authenticate = true) ->
-  if authenticate is true and config.username and config.password
-    return doAsync 'authenticate', [ config.username, config.password ], (result) ->
-      if result is false
-        log 'Failed to authenticate database credentials'
-        return process.exit 1
-      connected connection, false
-  collecions = {}
+  authenticationHandler = (result) ->
+    if result is false
+      log 'Failed to authenticate database credentials'
+      return process.exit 1
+    connected connection, false
 
   getCollections = ->
     doAsync connection, 'collectionNames', [], receiveCollections, true
@@ -91,6 +89,10 @@ connected = (connection, authenticate = true) ->
       data = event.getData()
       doAsync collections[data.type], 'update', [ data.query, { $set: data.instance }, { w: 1 } ], event.respond, false
 
+  if authenticate is true and config.username and config.password
+    return doAsync database, 'authenticate', [ config.username, config.password ], authenticationHandler, true
+
+  collecions = {}
   getCollections()
 
 doAsync = (object, methodName, args, after, failOnError, retryCount = 0) ->
