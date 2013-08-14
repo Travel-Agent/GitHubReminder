@@ -42,7 +42,7 @@ runJob = (error, user, after) ->
       httpFailOrContinue 'starred repositories', response, after, sendReminder
 
   sendReminder = (ignore, repos) ->
-    eventBroker.publish events.email.sendReminder, selectRandom repos, (response) ->
+    eventBroker.publish events.email.sendReminder, { to: user.email, data: selectRandom repos }, (response) ->
       httpFailOrContinue 'reminder email', response, after, generateJob
 
   generateJob = ->
