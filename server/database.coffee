@@ -90,7 +90,7 @@ connected = (connection, authenticate = true) ->
       doAsync collections[data.type], 'update', [ data.query, { $set: data.instance }, { w: 1 } ], event.respond, false
 
   if authenticate is true and config.username and config.password
-    return doAsync database, 'authenticate', [ config.username, config.password ], authenticationHandler, true
+    return doAsync connection, 'authenticate', [ config.username, config.password ], authenticationHandler, true
 
   collecions = {}
   getCollections()
