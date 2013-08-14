@@ -2,7 +2,7 @@
 
 mongo = require 'mongodb'
 eventBroker = require './eventBroker'
-config = require('../config').database[process.env.NODE_ENV || 'development']
+config = require('../config').database
 
 retryLimit = 3
 collections = [ 'users' ]

@@ -1,6 +1,6 @@
 'use strict'
 
-config = require('../../config').oauth[process.env.NODE_ENV || 'development']
+config = require('../../config').oauth
 
 module.exports =
   path: '/signin'

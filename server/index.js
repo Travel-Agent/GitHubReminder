@@ -35,7 +35,7 @@
       redirectTo: '/signin',
       appendNext: false
     },
-    cache: config.sessions[process.env.NODE_ENV || 'development']
+    cache: config.sessions
   });
 
   routes.initialise(server);

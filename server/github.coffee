@@ -7,7 +7,7 @@ eventBroker = require './eventBroker'
 packageInfo = require '../package.json'
 userAgent = "#{packageInfo.name}/#{packageInfo.version} (node.js/#{process.version})"
 
-config = require('../config').oauth[process.env.NODE_ENV || 'development']
+config = require('../config').oauth
 
 host = 'api.github.com'
 

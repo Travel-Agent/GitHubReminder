@@ -22,7 +22,7 @@ initialise = ->
 
   transport = nodemailer.createTransport 'SES',
     AWSAccessKeyID: config.key
-    AWSSecretKey: config.secret`
+    AWSSecretKey: config.secret
 
   eventBroker.subscribe 'email', eventHandlers
 

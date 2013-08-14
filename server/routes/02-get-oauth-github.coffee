@@ -4,7 +4,7 @@ pubsub = require 'pub-sub'
 check = require 'check-types'
 events = require '../events'
 eventBroker = require '../eventBroker'
-config = require('../../config').oauth[process.env.NODE_ENV || 'development']
+config = require('../../config').oauth
 
 module.exports =
   path: config.route
