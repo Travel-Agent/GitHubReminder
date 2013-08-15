@@ -10,19 +10,19 @@ initialise = ->
   eventHandlers =
     sendReminder: (event) ->
       { to, data } = event.getData()
-      transport.sendEmail
+      transport.sendEmail {
         from: config.from
         to: to
         subject: "#{subjectPrefix} #{data.full_name}"
         text: 'TODO'
-      , event.respond
+      }, event.respond
     sendError: (event) ->
-      transport.sendEmail
+      transport.sendEmail {
         from: config.from
         to: config.errors
         subject: "#{subjectPrefix}   E R R O R !"
         text: event.getData()
-      , event.respond
+      }, event.respond
 
   log 'initialising'
 
