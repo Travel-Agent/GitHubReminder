@@ -4,6 +4,7 @@ module.exports =
   path: '/unsubscribe'
   method: 'GET'
   config:
+    # TODO: View for success, view for error
     # TODO: Get user id from this.query, remove cron job, update db
     handler: ->
     auth:

@@ -29,7 +29,7 @@ module.exports =
           # TODO: Verify other email address
         else
           emailType = 'email'
-        generateJob()
+          generateJob()
 
       generateJob = ->
         eventBroker.publish events.jobs.generate, request.payload.frequency, (error, job) ->
