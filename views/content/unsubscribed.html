@@ -1,0 +1,21 @@
+{{#partial 'title'}}Email address unsubscribed{{/partial}}
+{{#partial 'content'}}
+<section>
+  <h2>Your email address has been unsubscribed</h2>
+
+  <p>
+    No further emails will be sent
+    to {{emailAddress}}.
+  </p>
+
+  {{#if isUserDeleted}}
+  <p>
+    Additionally,
+    all of your data
+    has been removed
+    from my database.
+  </p>
+  {{/if}}
+</section>
+{{/partial}}
+{{> layout}}
