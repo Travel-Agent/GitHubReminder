@@ -23,6 +23,14 @@ initialise = ->
         subject: "#{subjectPrefix}   E R R O R !"
         text: event.getData()
       }, event.respond
+    sendVerification: (event) ->
+      { to, data } = event.getData()
+      transport.sendEmail {
+        from: config.from
+        to: to
+        subject: "#{subjectPrefix} Verify email address"
+        text: 'TODO'
+      }, event.respond
 
   log 'initialising'
 

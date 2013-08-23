@@ -70,6 +70,10 @@ module.exports =
           isWeekly: currentUser.frequency is 'weekly'
           isMonthly: currentUser.frequency is 'monthly'
           isSaved: currentUser.isSaved
+          isFailed: request.query.saved is 'no'
+          reason: request.query.reason
+          isAwaitingVerification: request.query.verification is 'yes'
+          verificationEmail: if request.query.verification is 'yes' then request.query.emailAddress else ''
 
       begin()
 

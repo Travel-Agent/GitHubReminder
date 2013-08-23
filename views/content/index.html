@@ -49,6 +49,23 @@
 <section>
   <h2>Reminder settings</h2>
 
+  {{#if isSaved}}
+  <p class="news good">Your settings have been saved.</p>
+  {{/isSaved}}
+  {{#if isFailed}}
+  <p class="news bad">Your settings have not been saved because {{#reason}}.</p>
+  {{/isFailed}}
+  {{#if isAwaitingVerification}}
+  <p class="news indifferent">
+    Your email address must be verified
+    before your settings are made active.
+    An email has been sent
+    to {{verificationEmailAddress}};
+    if you click on the link in that email,
+    your reminders will be activated.
+  </p>
+  {{/isAwaitingVerification}}
+
   <form method="POST" action="/settings">
     <label for="select-email">Email address</label>
     <select name="email" id="select-email">
