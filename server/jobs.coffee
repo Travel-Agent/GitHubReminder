@@ -14,6 +14,7 @@ frequencies = { daily, weekly, monthly }
 initialise = ->
   log 'initialising'
   runDueJobs()
+  # TODO: Also kick-off hourly look-up for expired pending verifications, remove them from database
   eventBroker.subscribe 'jobs', eventHandlers
 
 log = (message) ->

@@ -18,6 +18,11 @@ module.exports =
         unless user.email is request.query.address
           return fail 'verify email', 'email/token mismatch'
 
+        # TODO:
+        #delete user.verify
+        #delete user.verifyExpire
+        #update user
+
         request.reply.view 'content/verified.html',
           emailAddress: user.email
 

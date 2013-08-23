@@ -25,7 +25,7 @@ initialise = (transport, config, subjectPrefix) ->
 
             http://githubreminder.org/verify-email?address=#{encodeURIComponent emailAddress}&token=#{token}
 
-            Goodbye,
+            Farewell,
             the reminder bot.
             """
     }, event.respond
