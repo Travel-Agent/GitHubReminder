@@ -36,10 +36,7 @@ module.exports =
           generateJob()
 
       verifyOtherEmail = ->
-        eventBroker.publish events.email.sendVerification, {
-          to: emailAddress
-          data: token
-        }, (error) ->
+        eventBroker.publish events.email.sendVerification, { emailAddress, token }, (error) ->
           failOrContinue error, 'send verification email', ->
             finish false, '/?verification=yes&emailAddress=#{encodeURIComponent emailAddress}'
 

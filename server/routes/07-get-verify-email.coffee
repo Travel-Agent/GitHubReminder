@@ -9,17 +9,22 @@ module.exports =
   config:
     handler: (request) ->
       getUser = ->
-        eventBroker.publish events.database.fetch, { type: 'users', query: { name: request.query.user } }, receiveUser
-    
+        eventBroker.publish events.database.fetch, { type: 'users', query: { verify: request.query.token } }, receiveUser
+
       receiveUser = (error, user) ->
         if error
-          # TODO: send error email?
-          request.reply.view 'content/error.html',
-            error: "server/routes/07: #{error}"
+          return fail 'fetch user', error
 
-        # TODO: Test request.query.token
+        unless user.email is request.query.address
+          return fail 'verify email', 'email/token mismatch'
+
         request.reply.view 'content/verified.html',
           emailAddress: user.email
+
+      fail = (what, reason) ->
+        # TODO: send error email?
+        request.reply.view 'content/error.html',
+          error: "server/routes/07: failed to #{what}, reason `#{reason}`"
     auth:
         mode: 'try'
 
