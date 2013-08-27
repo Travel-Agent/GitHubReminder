@@ -7,7 +7,7 @@ config = require('../config').database
 retryLimit = 3
 collections = [ 'users' ]
 indices =
-  users: [ { spec: { name: 1 }, isUnique: 1 }, { spec: { job: 1 } } ]
+  users: [ { spec: { name: 1 }, isUnique: 1 }, { spec: { job: 1 } }, { spec: { verifyExpire: 1 } } ]
 
 initialise = ->
   log 'initialising'
@@ -72,22 +72,26 @@ connected = (connection, authenticate = true) ->
     connection.on 'open', ->
       log 'connection opened'
 
+  createEventHandler = (action, getArgs) ->
+    (event) ->
+      data = event.getData()
+      doAsync collections[data.type], action, getArgs data, event.respond, false
+
   eventHandlers =
-    fetch: (event) ->
-      data = event.getData()
-      doAsync collections[data.type], 'findOne', [ data.query ], event.respond, false
+    fetch: createEventHandler 'findOne', (data) ->
+      [ data.query ]
 
-    fetchAll: (event) ->
-      data = event.getData()
-      doAsync collections[data.type], 'find', [ data.query ], event.respond, false
+    fetchAll: createEventHandler 'find', (data) ->
+      [ data.query ]
 
-    insert: (event) ->
-      data = event.getData()
-      doAsync collections[data.type], 'insert', [ data.instance, { w: 1 } ], event.respond, false
+    insert: createEventHandler 'insert', (data) ->
+      [ data.instance, { w: 1 } ]
 
-    update: (event) ->
-      data = event.getData()
-      doAsync collections[data.type], 'update', [ data.query, { $set: data.instance }, { w: 1 } ], event.respond, false
+    update: createEventHandler 'update', (data) ->
+      [ data.query, { $set: data.instance }, { w: 1 } ]
+
+    delete: createEventHandler 'remove', (data) ->
+      [ data.query, { w: 1 } ]
 
   if authenticate is true and config.username and config.password
     return doAsync connection, 'authenticate', [ config.username, config.password ], authenticationHandler, true

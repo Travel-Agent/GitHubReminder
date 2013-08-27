@@ -1,5 +1,6 @@
 'use strict'
 
+_ = require 'underscore'
 check = require 'check-types'
 events = require './events'
 eventBroker = require './eventBroker'
@@ -14,28 +15,28 @@ frequencies = { daily, weekly, monthly }
 initialise = ->
   log 'initialising'
   runDueJobs()
-  # TODO: Also kick-off hourly look-up for expired pending verifications, remove them from database
+  clearExpiredVerifications()
   eventBroker.subscribe 'jobs', eventHandlers
 
 log = (message) ->
   console.log "server/jobs: #{message}"
 
 runDueJobs = ->
+  log 'getting due jobs'
   eventBroker.publish events.database.fetchAll, { type: 'users', query: { job: { $lte: Date.now() } } }, (error, users) ->
     if error
       log "failed to get due jobs, reason `#{error}`"
     else
       log "got #{users.length} due jobs"
-      console.dir users
       users.forEach (user, index) ->
-        log "running due job #{index}"
+        log "running due job ##{index}"
         runJob null, user, (error) ->
           if error
-            return log "failed due job #{index}, reason `#{error}`"
+            return log "failed due job ##{index}, reason `#{error}`"
 
-          log "completed due job #{index}"
+          log "completed due job ##{index}"
 
-    setTimeout getDueJobs, hourly
+    setTimeout runDueJobs, hourly
 
 runJob = (error, user, after) ->
   getStarredRepos = ->
@@ -73,6 +74,10 @@ selectRandomItem = (from) ->
     return from
 
   from[Math.floor Math.random() * from.length]
+
+clearExpiredVerifications = ->
+  eventBroker.publish events.database.delete, { type: 'users', query: { verifyExpire: { $lt: Date.now() } }
+  setTimeout clearExpiredVerifications, hourly
 
 eventHandlers =
   generate: (event) ->

@@ -6,7 +6,7 @@ prefixes =
 
 events =
   github: [ 'get-token', 'get-user', 'get-email', 'get-starred-recent', 'get-starred-all' ]
-  database: [ 'fetch', 'fetch-all', 'insert', 'update' ]
+  database: [ 'fetch', 'fetch-all', 'insert', 'update', 'delete' ]
   jobs: [ 'generate', 'force' ]
   email: [ 'send-reminder', 'send-error', 'send-verification' ]
   tokens: [ 'generate' ]
