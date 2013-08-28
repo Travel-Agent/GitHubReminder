@@ -23,7 +23,7 @@ log = (message) ->
 
 runDueJobs = ->
   log 'getting due jobs'
-  eventBroker.publish events.database.fetchAll, { type: 'users', query: { job: { $lte: Date.now() } } }, (error, users) ->
+  eventBroker.publish events.database.fetchAll, { type: 'users', query: { job: { $lte: Date.now() }, verify: { $exists: false } } }, (error, users) ->
     if error
       log "failed to get due jobs, reason `#{error}`"
     else
