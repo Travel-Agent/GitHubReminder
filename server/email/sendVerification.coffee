@@ -14,7 +14,7 @@ initialise = (transport, config, subjectPrefix) ->
 
             The email address `#{emailAddress}` has been registered on:
 
-            http://githubreminder.org/
+            #{config.baseUri}
 
             If this was not you or it was done in error, you can ignore this
             message. The email address will be removed from my database in
@@ -23,7 +23,7 @@ initialise = (transport, config, subjectPrefix) ->
             If you would like to verify the email address and activate your
             reminders, just GET the following URL within the next 24 hours:
 
-            http://githubreminder.org/verify-email?address=#{encodeURIComponent emailAddress}&token=#{token}
+            #{config.baseUri}verify-email?address=#{encodeURIComponent emailAddress}&token=#{token}
 
             Farewell,
             the reminder bot.
