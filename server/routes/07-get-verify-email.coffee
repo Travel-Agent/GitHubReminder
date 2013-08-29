@@ -7,6 +7,8 @@ module.exports =
   path: '/verify-email'
   method: 'GET'
   config:
+    auth:
+        mode: 'try'
     handler: (request) ->
       getUser = ->
         eventBroker.publish events.database.fetch, { type: 'users', query }, receiveUser
@@ -15,8 +17,9 @@ module.exports =
         if error
           return fail 'fetch user', error
 
-        unless user.email is request.query.address
-          return fail 'verify email', 'email/token mismatch'
+        # TODO: decodeURIComponent?
+        unless user.verify is request.query.token
+          return fail 'verify email', 'token mismatch'
 
         updateUser user
 
@@ -38,10 +41,7 @@ module.exports =
           emailAddress: user.email
 
       query =
-        verify: request.query.token
+        name: request.query.user
 
       getUser()
-
-    auth:
-        mode: 'try'
 

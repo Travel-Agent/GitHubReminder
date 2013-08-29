@@ -4,7 +4,7 @@ module.exports = { initialise }
 
 initialise = (transport, config, subjectPrefix) ->
   (event) ->
-    { emailAddress, token } = event.getData()
+    { user, emailAddress, token } = event.getData()
     transport.sendEmail {
       from: config.from
       to: emailAddress
@@ -23,7 +23,7 @@ initialise = (transport, config, subjectPrefix) ->
             If you would like to verify the email address and activate your
             reminders, just GET the following URL within the next 24 hours:
 
-            #{config.baseUri}verify-email?address=#{encodeURIComponent emailAddress}&token=#{token}
+            #{config.baseUri}verify-email?user=#{encodeURIComponent user}&token=#{encodeURIComponent token}
 
             Farewell,
             the reminder bot.

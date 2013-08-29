@@ -12,6 +12,8 @@ weekly = daily * 7
 monthly = (weekly * 52) / 12
 frequencies = { daily, weekly, monthly }
 
+baseUri = 'http://githubreminder.org/'
+
 initialise = ->
   log 'initialising'
   runDueJobs()
@@ -39,12 +41,45 @@ runDueJobs = ->
     setTimeout runDueJobs, hourly
 
 runJob = (error, user, after) ->
+  repos = undefined
+
   getStarredRepos = ->
     eventBroker.publish events.github.getStarredAll, user.auth, (response) ->
-      httpFailOrContinue 'starred repositories', response, after, sendReminder
+      httpFailOrContinue 'starred repositories', response, after, receiveStarredRepos
 
-  sendReminder = (ignore, repos) ->
-    eventBroker.publish events.email.sendReminder, { to: user.email, data: selectRandom repos }, (response) ->
+  receiveStarredRepos = (ignore, result) ->
+    repos = result
+
+    unless user.unsubscribe
+      return getToken()
+
+    sendReminder()
+
+  getToken = ->
+    eventBroker.publish events.tokens.generate, null, updateUser
+
+  updateUser = (token) ->
+    user.unsubscribe = token
+    eventBroker.publish events.database.update, {
+      type: 'users'
+      query:
+        name: user.name
+      instance: user
+    }, (error, result) ->
+      failOrContinue error, result, after, sendReminder
+
+  sendReminder = ->
+    # TODO: Finish implementing unsubscribe
+    unsubscribe = "#{baseUri}/unsubscribe?user=#{user.name}&token=#{user.unsubscribe}"
+    eventBroker.publish events.email.sendReminder, {
+      to: user.email
+      frequency: user.frequency
+      repo: selectRandom repos
+      uris:
+        settings: baseUri
+        unsubscribe
+        clobber: "#{unsubscribe}&clobber=yes"
+    }, (response) ->
       httpFailOrContinue 'reminder email', response, after, generateJob
 
   generateJob = ->

@@ -30,7 +30,7 @@ module.exports =
           emailAddress = request.payload.otherEmail
           eventBroker.publish events.tokens.generate, null, (t) ->
             token = t
-            updateUser { verify: token, verifExpire: Date.now() }, verifyOtherEmail
+            updateUser { verify: token, verifyExpire: Date.now() }, verifyOtherEmail
         else
           emailAddress = request.payload.email
           generateJob()
