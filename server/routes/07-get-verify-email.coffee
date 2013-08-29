@@ -2,6 +2,7 @@
 
 events = require '../events'
 eventBroker = require '../eventBroker'
+tokenHelper = require './helpers/token'
 
 module.exports =
   path: '/verify-email'
@@ -10,38 +11,25 @@ module.exports =
     auth:
         mode: 'try'
     handler: (request) ->
-      getUser = ->
-        eventBroker.publish events.database.fetch, { type: 'users', query }, receiveUser
+      updateUser = (user) ->
+        eventBroker.publish events.database.update, {
+          type: 'users'
+          query:
+            name: request.query.user
+          unset:
+            verify: null
+            verifyExpire: null
+        }, _.partial respond, user.email
 
-      receiveUser = (error, user) ->
+      respond = (emailAddress, error) ->
         if error
-          return fail 'fetch user', error
+          return eventBroker.publish events.errors.report, {
+            request
+            action: 'update user'
+            message: error
+          }
 
-        # TODO: decodeURIComponent?
-        unless user.verify is request.query.token
-          return fail 'verify email', 'token mismatch'
+        request.reply.view 'content/verified.html', { emailAddress }
 
-        updateUser user
-
-      fail = (what, reason) ->
-        # TODO: send error email?
-        request.reply.view 'content/error.html',
-          error: "server/routes/07: failed to #{what}, reason `#{reason}`"
-
-      updateUser = (instance) ->
-        delete instance.verify
-        delete instance.verifyExpire
-        eventBroker.publish events.database.update, { type: 'users', query, instance }, respond
-
-      respond = (error) ->
-        if error
-          return fail 'update user', error
-
-        request.reply.view 'content/verified.html',
-          emailAddress: user.email
-
-      query =
-        name: request.query.user
-
-      getUser()
+      tokenHelper.check request, 'verify', updateUser
 

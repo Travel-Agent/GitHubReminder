@@ -1,6 +1,9 @@
 'use strict'
 
 _ = require 'underscore'
+events = require '../events'
+eventBroker = require '../eventBroker'
+tokenHelper = require './helpers/token'
 
 module.exports =
   path: '/unsubscribe'
@@ -9,43 +12,35 @@ module.exports =
     auth:
       mode: 'try'
     handler: (request) ->
-      getUser = ->
-        eventBroker.publish events.database.fetch, { type: 'users', query }, receiveUser
+      deleteUser = (user) ->
+        eventBroker.publish events.database.delete, { type: 'users', query }, _.partial respond, true, user.email
 
-      receiveUser = (error, user) ->
+      respond = (isUserDeleted, emailAddress, error) ->
         if error
-          return fail 'fetch user', error
+          return eventBroker.publish events.errors.report, {
+            request
+            action: "#{if isUserDeleted then 'delete' else 'update'} user"
+            message: error
+          }
 
-        # TODO: decodeURIComponent?
-        unless user.unsubscribe is request.query.token
-         return fail 'unsubscribe', 'token mismatch'
+        request.reply.view 'content/unsubscribed.html', { emailAddress, isUserDeleted }
 
+      updateUser = (user) ->
+        eventBroker.publish events.database.update, {
+          type: 'users'
+          query
+          unset:
+            job: null
+            isSaved: null
+        }, _.partial respond, false, user.email
+
+      query =
+        name: request.query.user
+
+      tokenHelper.check request, 'unsubscribe', (user) ->
         if request.query.clobber is 'yes'
           return deleteUser user
 
         updateUser user
 
-      fail = (what, reason) ->
-        # TODO: send error email?
-        request.reply.view 'content/error.html',
-          error: "server/routes/08: failed to #{what}, reason `#{reason}`"
-
-      deleteUser = (instance) ->
-        eventBroker.publish events.database.delete, { type: 'users', query }, _.partial respond, true, user.email
-
-      respond = (isUserDeleted, emailAddress, error) ->
-        if error
-          return fail "#{if isUserDeleted then 'delete' else 'update'} user", error
-
-        request.reply.view 'content/unsubscribed.html', { emailAddress, isUserDeleted }
-
-      updateUser = (instance) ->
-        delete instance.job
-        delete instance.isSaved
-        eventBroker.publish events.database.update, { type: 'users', query, instance }, _.partial respond, false, user.email
-
-      query =
-        name: request.query.user
-
-      getUser()
 

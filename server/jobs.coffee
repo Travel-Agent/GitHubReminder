@@ -25,7 +25,14 @@ log = (message) ->
 
 runDueJobs = ->
   log 'getting due jobs'
-  eventBroker.publish events.database.fetchAll, { type: 'users', query: { job: { $lte: Date.now() }, verify: { $exists: false } } }, (error, users) ->
+  eventBroker.publish events.database.fetchAll, {
+    type: 'users'
+    query:
+      job:
+        $lte: Date.now()
+      verify:
+        $exists: false
+  }, (error, users) ->
     if error
       log "failed to get due jobs, reason `#{error}`"
     else
@@ -59,12 +66,12 @@ runJob = (error, user, after) ->
     eventBroker.publish events.tokens.generate, null, updateUser
 
   updateUser = (token) ->
-    user.unsubscribe = token
     eventBroker.publish events.database.update, {
       type: 'users'
       query:
         name: user.name
-      instance: user
+      set:
+        unsubscribe: token
     }, (error, result) ->
       failOrContinue error, result, after, sendReminder
 
@@ -75,10 +82,11 @@ runJob = (error, user, after) ->
       to: user.email
       frequency: user.frequency
       repo: selectRandom repos
-      uris:
+      uris: {
         settings: baseUri
         unsubscribe
         clobber: "#{unsubscribe}&clobber=yes"
+      }
     }, (response) ->
       httpFailOrContinue 'reminder email', response, after, generateJob
 
@@ -87,7 +95,12 @@ runJob = (error, user, after) ->
       failOrContinue error, job, after, updateJob
 
   updateJob = (job) ->
-    eventBroker.publish events.database.update, { type: 'users', query: { name: user.name }, instance: { job } }, after
+    eventBroker.publish events.database.update, {
+      type: 'users'
+      query:
+        name: user.name
+      set: { job }
+    }, after
 
   failOrContinue error, user, after, getStarredRepos
 
@@ -111,7 +124,11 @@ selectRandomItem = (from) ->
   from[Math.floor Math.random() * from.length]
 
 clearExpiredVerifications = ->
-  eventBroker.publish events.database.delete, { type: 'users', query: { verifyExpire: { $lt: Date.now() } }
+  eventBroker.publish events.database.delete,
+    type: 'users'
+    query:
+      verifyExpire:
+        $lt: Date.now()
   setTimeout clearExpiredVerifications, hourly
 
 eventHandlers =
@@ -126,7 +143,11 @@ eventHandlers =
 
   force: (event) ->
     log 'forcing immediate job'
-    eventBroker.publish events.database.fetch, { type: 'users', query: { name: event.getData() } }, (error, user) ->
+    eventBroker.publish events.database.fetch, {
+      type: 'users'
+      query:
+        name: event.getData()
+    }, (error, user) ->
       runJob error, user, event.respond
 
 module.exports = { initialise }

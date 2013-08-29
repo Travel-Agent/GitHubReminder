@@ -1,7 +1,5 @@
 'use strict'
 
-module.exports = { initialise }
-
 initialise = (transport, config, subjectPrefix) ->
   (event) ->
     { to, frequency, repo, uris } = event.getData()
@@ -40,4 +38,6 @@ initialise = (transport, config, subjectPrefix) ->
             #{uris.clobber}
             """
     }, event.respond
+
+module.exports = { initialise }
 

@@ -1,19 +1,21 @@
 'use strict'
 
+fs = require 'fs'
+path = require 'path'
 nodemailer = require 'nodemailer'
 eventBroker = require '../eventBroker'
 config = require('../../config').email
 
 initialise = ->
-  parseEventHandlers = (fileName, handlers) ->
-    handlers[fileName] = require("./#{fileName}").initialise transport, config, '[GitHubReminder]'
+  parseEventHandler = (handlers, moduleName) ->
+    handlers[moduleName] = require("./#{moduleName}").initialise transport, config, '[GitHubReminder]'
     handlers
 
   transport = nodemailer.createTransport 'SES',
     AWSAccessKeyID: config.key
     AWSSecretKey: config.secret
 
-  eventBroker.subscribe 'email', getFileNames().filter(isEventHandler).reduce parseEventHandlers, {}
+  eventBroker.subscribe 'email', getFileNames().filter(isEventHandler).map(removeExtension).reduce parseEventHandler, {}
 
 getFileNames = ->
   fs.readdirSync __dirname
@@ -24,6 +26,9 @@ isEventHandler = (fileName) ->
     return components.length is 2 and components[0] isnt 'index' and components[1] is 'coffee'
 
   false
+
+removeExtension = (fileName) ->
+  fileName.split('.')[0]
 
 module.exports = { initialise }
 

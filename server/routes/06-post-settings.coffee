@@ -70,7 +70,7 @@ module.exports =
           type: 'users'
           query:
             name: request.state.sid.user
-          instance: _.defaults fields,
+          set: _.defaults fields,
             email: emailAddress
             frequency: request.payload.frequency
             isSaved: true

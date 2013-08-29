@@ -1,7 +1,5 @@
 'use strict'
 
-module.exports = { initialise }
-
 initialise = (transport, config, subjectPrefix) ->
   (event) ->
     { user, emailAddress, token } = event.getData()
@@ -29,4 +27,6 @@ initialise = (transport, config, subjectPrefix) ->
             the reminder bot.
             """
     }, event.respond
+
+module.exports = { initialise }
 

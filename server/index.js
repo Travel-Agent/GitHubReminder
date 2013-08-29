@@ -7,7 +7,7 @@
 
   coffee = require('coffee-script');
 
-  modules = ['templates', 'database', 'github', 'jobs', 'email'];
+  modules = ['templates', 'database', 'github', 'jobs', 'email', 'tokens', 'errors'];
 
   modules.forEach(function(m) {
     return require("./" + m).initialise();

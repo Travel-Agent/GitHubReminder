@@ -10,6 +10,7 @@ events =
   jobs: [ 'generate', 'force' ]
   email: [ 'send-reminder', 'send-error', 'send-verification' ]
   tokens: [ 'generate' ]
+  errors: [ 'report' ]
 
 getEventMap = ->
   result = {}

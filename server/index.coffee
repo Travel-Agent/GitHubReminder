@@ -4,7 +4,7 @@ console.log "$PORT is `#{process.env.PORT}`"
 
 coffee = require 'coffee-script'
 
-modules = [ 'templates', 'database', 'github', 'jobs', 'email' ]
+modules = [ 'templates', 'database', 'github', 'jobs', 'email', 'tokens', 'errors' ]
 modules.forEach (m) ->
   require("./#{m}").initialise()
 

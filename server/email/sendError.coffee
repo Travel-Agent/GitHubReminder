@@ -1,7 +1,5 @@
 'use strict'
 
-module.exports = { initialise }
-
 initialise = (transport, config, subjectPrefix) ->
   (event) ->
     transport.sendEmail {
@@ -10,4 +8,6 @@ initialise = (transport, config, subjectPrefix) ->
       subject: "#{subjectPrefix}   E R R O R !"
       text: 'TODO'
     }, event.respond
+
+module.exports = { initialise }
 

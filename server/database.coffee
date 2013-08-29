@@ -88,7 +88,7 @@ connected = (connection, authenticate = true) ->
       [ data.instance, { w: 1 } ]
 
     update: createEventHandler 'update', (data) ->
-      [ data.query, { $set: data.instance }, { w: 1 } ]
+      [ data.query, { $set: data.set, $unset: data.unset }, { w: 1 } ]
 
     delete: createEventHandler 'remove', (data) ->
       [ data.query, { w: 1 } ]

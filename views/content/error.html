@@ -1,9 +1,9 @@
 {{#partial 'title'}}Error{{/partial}}
 {{#partial 'content'}}
 <section>
-  <h2>Whoopsie!</h2>
+  <h2>Crikey</h2>
 
-  <!-- TODO: Add form for creating an issue via the GitHub API -->
+  <!-- TODO: Add form for creating an issue via the GitHub API? Create GitHub issue via the API automatically? -->
 
   <p>
     Something went wrong.
@@ -11,26 +11,21 @@
     if that fails,
     <a href="https://github.com/philbooth/GitHubReminder/issues/new">create an issue</a>
     on GitHub
-    and I will look into it pronto.
-    To help me fix the bug,
-    it would be awesome
-    if you could add plenty of detail
-    to the description,
-    including exactly what steps you took,
-    the name and version
-    of your browser
-    and operating system,
-    and the following error message:
+    and I'll look into it pronto.
+    It would be sweet
+    if you could paste
+    the following error details
+    into the description too:
   </p>
 
-  <p class="error">
-    {{errorMessage}}
-  </p>
+  <ul class="details">
+    <li>Origin: {{origin}}</li>
+    <li>Action: {{action}}</li>
+    <li>{{message}}</li>
+  </ul>
 
   <p>
-    Thanks for that,
-    and I'm really sorry
-    for writing such shitty code.
+    Thanks.
   </p>
 </section>
 {{/partial}}
