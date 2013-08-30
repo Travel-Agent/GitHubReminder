@@ -1,9 +1,12 @@
 'use strict'
 
+_ = require 'underscore'
 pubsub = require 'pub-sub'
 check = require 'check-types'
 events = require '../events'
 eventBroker = require '../eventBroker'
+errorHelper = require './helpers/error'
+httpErrorHelper = require './helpers/httpError'
 config = require('../../config').oauth
 
 module.exports =
@@ -13,28 +16,18 @@ module.exports =
     auth:
       mode: 'try'
     handler: (request) ->
-      oauthToken = undefined
+      auth = undefined
 
       getToken = ->
         if request.query.state is config.state
           eventBroker.publish events.github.getToken, request.query.code, (response) ->
-            failOrContinue response, (body) ->
-              oauthToken = body.access_token
+            httpErrorHelper.failOrContinue request, response, (body) ->
+              auth = body.access_token
               getGhUser()
 
-      failOrContinue = (response, next) ->
-        if response and response.status is 200
-          return next response.body
-
-        fail "Received #{response.status} response from `#{response.origin}`"
-
-      fail = (error) ->
-        request.reply.view 'content/error.html',
-          error: "server/routes/02: #{error}"
-
       getGhUser = ->
-        eventBroker.publish events.github.getUser, oauthToken, (response) ->
-          failOrContinue response, getDbUser
+        eventBroker.publish events.github.getUser, auth, (response) ->
+          httpErrorHelper.failOrContinue request, response, getDbUser
 
       getDbUser = (user) ->
         eventBroker.publish events.database.fetch, { type: 'users', query: { name: user.login } }, (error, dbUser) ->
@@ -44,29 +37,14 @@ module.exports =
         if check.isObject user
           return respond user
 
-        if error
-          return databaseFail 'fetch user', error
-
-        storeDbUser
-          name: name
-          avatar: avatar
-          auth: oauthToken
-          frequency: 'weekly'
-          isSaved: false
-
-      databaseFail = (operation, error) ->
-        fail "Failed to #{operation}, reason `#{error}`"
+        errorHelper.failOrContinue error, 'fetch user', _.partial storeDbUser, { name, avatar, auth, frequency: 'weekly', isSaved: false }
 
       storeDbUser = (user) ->
         eventBroker.publish events.database.insert, { type: 'users', instance: user }, (error) ->
-          if error
-            return databaseFail 'store user', error
-          respond user
+          databaseFailOrContinue error, 'store user', _.partial respond, user
 
       respond = (user) ->
-        request.auth.session.set
-          user: user.name
-          auth: oauthToken
+        request.auth.session.set { user: user.name, auth }
         request.reply.redirect '/'
 
       getToken()

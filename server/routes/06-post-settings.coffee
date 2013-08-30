@@ -4,7 +4,7 @@
 _ = require 'underscore'
 events = require '../events'
 eventBroker = require '../eventBroker'
-jobs = require '../jobs'
+errorHelper = require './helpers/error'
 
 module.exports =
   path: '/settings'
@@ -37,18 +37,8 @@ module.exports =
 
       verifyOtherEmail = ->
         eventBroker.publish events.email.sendVerification, { emailAddress, token }, (error) ->
-          failOrContinue error, 'send verification email', ->
-            finish false, '/?verification=yes&emailAddress=#{encodeURIComponent emailAddress}'
-
-      failOrContinue = (error, what, after) ->
-        if error
-          return fail what, error
-        after()
-
-      fail = (what, reason) ->
-        # TODO: Send error email
-        request.reply.view 'content/error.html',
-          error: "server/routes/05: Failed to #{what}, reason `#{reason}`"
+          next = _.partial finish, false, "/?verification=yes&emailAddress=#{encodeURIComponent emailAddress}"
+          errorHelper.failOrContinue request, error, 'send verification email', next
 
       finish = (allowImmediate, redirectPath) ->
         if allowImmediate and request.payload.immediate is 'true'
@@ -57,13 +47,11 @@ module.exports =
 
       generateJob = ->
         eventBroker.publish events.jobs.generate, request.payload.frequency, (error, job) ->
-          failOrContinue error, 'generate job', ->
-            receiveJob user
+          errorHelper.failOrContinue request, error, 'generate job', _.partial receiveJob, job
 
       receiveJob = (job) ->
         updateUser { job }, (error) ->
-          failOrContinue error, 'update user', ->
-            finish true, '/'
+          errorHelper.failOrContinue request, error, 'update user', _.partial finish, true, '/'
 
       updateUser = (fields, after) ->
         eventBroker.publish events.database.update, {

@@ -62,11 +62,9 @@ request = (what, options, data, callback) ->
       body += response.read()
 
     response.on 'end', ->
-      originIndex = options.path.indexOf '?'
-      origin = if originIndex is -1 then options.path else options.path.substring 0, originIndex
       callback
         status: response.statusCode
-        origin: origin
+        origin: "#{response.req.method} #{response.req.path}"
         headers: response.headers
         body: if response.statusCode is 200 then JSON.parse body else body
 

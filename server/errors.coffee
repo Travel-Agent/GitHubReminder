@@ -4,16 +4,22 @@ eventBroker = require './eventBroker'
 
 initialise = ->
   eventHandlers =
-    report: (request, action, message) ->
+    report: (event) ->
+
+      { request, action, message } = event.getData()
+
       # TODO: send error email
 
-      console.log 'P H I L ! ! !'
-      console.dir request.route
-
-      request.reply.view 'content/error.html',
-        origin: request.route.name
+      request.reply.view 'content/error.html', {
         action
         message
+        route: "#{request.route.method.toUpperCase()} #{request.route.path}"
+        host: request.info.host
+        path: request.path
+        method: request.method.toUpperCase()
+        user: request.state?.user
+        referrer: request.info.referrer
+      }
 
   eventBroker.subscribe 'errors', eventHandlers
 

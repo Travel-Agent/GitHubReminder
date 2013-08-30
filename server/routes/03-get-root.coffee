@@ -3,6 +3,8 @@
 check = require 'check-types'
 events = require '../events'
 eventBroker = require '../eventBroker'
+errorHelper = require './helpers/error'
+httpErrorHelper = require './helpers/httpError'
 
 module.exports =
   path: '/'
@@ -19,42 +21,43 @@ module.exports =
         getRecentStars()
 
       getUser = ->
-        eventBroker.publish events.database.fetch, { type: 'users', query: { name: request.state.sid.user } }, (error, user) ->
-          if error
-            return fail "Failed to fetch user from database, reason `#{error}`"
+        eventBroker.publish events.database.fetch, { type: 'users', query: { name: request.state.sid.user } }, receiveUser
+
+      receiveUser = (error, user) ->
+        errorHelper.failOrContinue request, error, 'fetch user', ->
           currentUser = user
           after()
-
-      fail = (error) ->
-        outstandingRequests = -1
-        request.reply.view 'content/error.html',
-          error: "server/routes/04: #{error}"
+        , onError
 
       after = ->
         outstandingRequests -= 1
         if outstandingRequests is 0
           respond()
 
+      onError = ->
+        outstandingRequests = -1
+
       getEmails = (user) ->
-        eventBroker.publish events.github.getEmail, request.state.sid.auth, (response) ->
-          unless response.status is 200
-            return responseFail response
+        eventBroker.publish events.github.getEmail, request.state.sid.auth, receiveEmails
+
+      receiveEmails = (response) ->
+        httpErrorHelper.failOrContinue request, response, ->
           currentEmails = response.body.filter((email) ->
             email.verified is true
           ).map (email) ->
             address: email.email
             isSelected: currentUser.email is email.email
           after()
-
-      responseFail = (response) ->
-        fail "Received #{response.status} response from `#{response.origin}`"
+        , onError
 
       getRecentStars = ->
-        eventBroker.publish events.github.getStarredRecent, request.state.sid.auth, (response) ->
-          unless response.status is 200
-            return responseFail response
+        eventBroker.publish events.github.getStarredRecent, request.state.sid.auth, receiveRecentStars
+
+      receiveRecentStars = (response) ->
+        httpErrorHelper.failOrContinue request, response, ->
           currentStars = response.body
           after()
+        , onError
 
       respond = ->
         isOtherEmail = currentUser.isSaved and currentEmails.every (email) ->
