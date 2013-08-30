@@ -77,7 +77,6 @@ runJob = (error, user, after) ->
       failOrContinue error, result, after, sendReminder
 
   sendReminder = ->
-    # TODO: Finish implementing unsubscribe
     unsubscribe = "#{baseUri}/unsubscribe?user=#{user.name}&token=#{user.unsubscribe}"
     eventBroker.publish events.email.sendReminder, {
       to: user.email
