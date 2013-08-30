@@ -47,5 +47,8 @@ module.exports =
         request.auth.session.set { user: user.name, auth }
         request.reply.redirect '/'
 
+      if request.query.error
+        return errorHelper.fail request, 'OAuth', "Error: #{request.query.error}"
+
       getToken()
 
