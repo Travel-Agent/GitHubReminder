@@ -51,10 +51,10 @@
 
   {{#if isSaved}}
   <p class="news good">Your settings have been saved.</p>
-  {{/isSaved}}
+  {{/if}}
   {{#if isFailed}}
-  <p class="news bad">Your settings have not been saved because {{#reason}}.</p>
-  {{/isFailed}}
+  <p class="news bad">Your settings have not been saved because {{reason}}.</p>
+  {{/if}}
   {{#if isAwaitingVerification}}
   <p class="news indifferent">
     Your email address must be verified
@@ -64,7 +64,7 @@
     if you click on the link in that email,
     your reminders will be activated.
   </p>
-  {{/isAwaitingVerification}}
+  {{/if}}
 
   <form method="POST" action="/settings">
     <label for="select-email">Email address</label>

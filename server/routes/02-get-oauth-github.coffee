@@ -37,11 +37,11 @@ module.exports =
         if check.isObject user
           return respond user
 
-        errorHelper.failOrContinue error, 'fetch user', _.partial storeDbUser, { name, avatar, auth, frequency: 'weekly', isSaved: false }
+        errorHelper.failOrContinue request, error, 'fetch user', _.partial storeDbUser, { name, avatar, auth, frequency: 'weekly', isSaved: false }
 
       storeDbUser = (user) ->
         eventBroker.publish events.database.insert, { type: 'users', instance: user }, (error) ->
-          databaseFailOrContinue error, 'store user', _.partial respond, user
+          errorHelper.failOrContinue request, error, 'store user', _.partial respond, user
 
       respond = (user) ->
         request.auth.session.set { user: user.name, auth }

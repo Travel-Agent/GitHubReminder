@@ -75,7 +75,7 @@ connected = (connection, authenticate = true) ->
   createEventHandler = (action, getArgs) ->
     (event) ->
       data = event.getData()
-      doAsync collections[data.type], action, getArgs data, event.respond, false
+      doAsync collections[data.type], action, getArgs(data), event.respond, false
 
   eventHandlers =
     fetch: createEventHandler 'findOne', (data) ->
