@@ -36,7 +36,11 @@ module.exports =
           generateJob()
 
       verifyOtherEmail = ->
-        eventBroker.publish events.email.sendVerification, { emailAddress, token }, (error) ->
+        eventBroker.publish events.email.sendVerification, {
+          user: request.state.sid.user
+          emailAddress
+          token
+        }, (error) ->
           next = _.partial finish, false, "/?verification=yes&emailAddress=#{encodeURIComponent emailAddress}"
           errorHelper.failOrContinue request, error, 'send verification email', next
 
