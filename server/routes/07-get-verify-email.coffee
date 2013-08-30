@@ -16,6 +16,7 @@ module.exports =
           type: 'users'
           query:
             name: request.query.user
+          set: {}
           unset:
             verify: null
             verifyExpire: null

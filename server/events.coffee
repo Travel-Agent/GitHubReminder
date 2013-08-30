@@ -3,6 +3,10 @@
 prefixes =
   github: 'gh'
   database: 'db'
+  jobs: 'jb'
+  email: 'em'
+  tokens: 'tk'
+  errors: 'er'
 
 events =
   github: [ 'get-token', 'get-user', 'get-email', 'get-starred-recent', 'get-starred-all' ]

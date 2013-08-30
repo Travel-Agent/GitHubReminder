@@ -2,7 +2,7 @@
 
 initialise = (transport, config, subjectPrefix) ->
   (event) ->
-    transport.sendEmail {
+    transport.sendMail {
       from: config.from
       to: config.errors
       subject: "#{subjectPrefix}   E R R O R !"

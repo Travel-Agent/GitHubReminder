@@ -72,6 +72,7 @@ runJob = (error, user, after) ->
         name: user.name
       set:
         unsubscribe: token
+      unset: {}
     }, (error, result) ->
       failOrContinue error, result, after, sendReminder
 
@@ -100,6 +101,7 @@ runJob = (error, user, after) ->
       query:
         name: user.name
       set: { job }
+      unset: {}
     }, after
 
   failOrContinue error, user, after, getStarredRepos

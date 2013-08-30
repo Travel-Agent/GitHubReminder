@@ -3,14 +3,14 @@
 initialise = (transport, config, subjectPrefix) ->
   (event) ->
     { user, emailAddress, token } = event.getData()
-    transport.sendEmail {
+    transport.sendMail {
       from: config.from
       to: emailAddress
       subject: "#{subjectPrefix} Verify email address"
       text: """
             Hello,
 
-            The email address `#{emailAddress}` has been registered on:
+            The email address #{emailAddress} has been registered on:
 
             #{config.baseUri}
 

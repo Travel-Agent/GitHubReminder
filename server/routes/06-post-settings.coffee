@@ -62,6 +62,7 @@ module.exports =
             email: emailAddress
             frequency: request.payload.frequency
             isSaved: true
+          unset: {}
         }, after
 
       verifyEmail()

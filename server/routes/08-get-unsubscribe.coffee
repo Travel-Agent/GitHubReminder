@@ -29,6 +29,7 @@ module.exports =
         eventBroker.publish events.database.update, {
           type: 'users'
           query
+          set: {}
           unset:
             job: null
             isSaved: null

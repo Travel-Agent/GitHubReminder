@@ -60,14 +60,22 @@ module.exports =
         , onError
 
       respond = ->
+        isAwaitingVerification = request.query.verification is 'yes'
         isOtherEmail = currentUser.isSaved and currentEmails.every (email) ->
           email.isSelected is false
-        request.reply.view 'content/index.html',
+        if isOtherEmail
+          if isAwaitingVerification
+            otherEmail = request.query.emailAddress
+          else
+            otherEmail = currentUser.email
+        else
+          otherEmail = ''
+        request.reply.view 'content/index.html', {
           user: currentUser.name
           avatar: currentUser.avatar
           email: currentEmails
-          isOtherEmail: isOtherEmail
-          otherEmail: if isOtherEmail then currentUser.email else ''
+          isOtherEmail
+          otherEmail
           repos: currentStars
           isDaily: currentUser.frequency is 'daily'
           isWeekly: currentUser.frequency is 'weekly'
@@ -75,8 +83,9 @@ module.exports =
           isSaved: currentUser.isSaved
           isFailed: request.query.saved is 'no'
           reason: request.query.reason
-          isAwaitingVerification: request.query.verification is 'yes'
-          verificationEmail: if request.query.verification is 'yes' then request.query.emailAddress else ''
+          isAwaitingVerification
+          verificationEmail: request.query.emailAddress
+        }
 
       begin()
 

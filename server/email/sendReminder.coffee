@@ -3,7 +3,7 @@
 initialise = (transport, config, subjectPrefix) ->
   (event) ->
     { to, frequency, repo, uris } = event.getData()
-    transport.sendEmail {
+    transport.sendMail {
       from: config.from
       to: to
       subject: "#{subjectPrefix} #{repo.name}"
