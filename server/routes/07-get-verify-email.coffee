@@ -2,6 +2,7 @@
 
 events = require '../events'
 eventBroker = require '../eventBroker'
+userHelper = require './helpers/user'
 tokenHelper = require './helpers/token'
 
 module.exports =
@@ -12,15 +13,7 @@ module.exports =
         mode: 'try'
     handler: (request) ->
       updateUser = (user) ->
-        eventBroker.publish events.database.update, {
-          type: 'users'
-          query:
-            name: request.query.user
-          set: {}
-          unset:
-            verify: null
-            verifyExpire: null
-        }, _.partial respond, user.email
+        userHelper.update request.query.user, {}, { verify: null, verifyExpire: null }, _.partial respond, user.email
 
       respond = (emailAddress, error) ->
         if error

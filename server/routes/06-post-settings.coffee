@@ -4,6 +4,7 @@
 _ = require 'underscore'
 events = require '../events'
 eventBroker = require '../eventBroker'
+userHelper = require './helpers/user'
 errorHelper = require './helpers/error'
 
 module.exports =
@@ -58,16 +59,11 @@ module.exports =
           errorHelper.failOrContinue request, error, 'update user', _.partial finish, true, '/'
 
       updateUser = (fields, after) ->
-        eventBroker.publish events.database.update, {
-          type: 'users'
-          query:
-            name: request.state.sid.user
-          set: _.defaults fields,
-            email: emailAddress
-            frequency: request.payload.frequency
-            isSaved: true
-          unset: {}
-        }, after
+        userHelper.update name, _.defaults(fields,
+          email: emailAddress
+          frequency: request.payload.frequency
+          isSaved: true
+        ), {}, after
 
       verifyEmail()
 

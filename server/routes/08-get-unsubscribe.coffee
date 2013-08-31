@@ -1,8 +1,8 @@
 'use strict'
 
 _ = require 'underscore'
-events = require '../events'
-eventBroker = require '../eventBroker'
+userHelper = require './helpers/user'
+errorHelper = require './helpers/error'
 tokenHelper = require './helpers/token'
 
 module.exports =
@@ -13,27 +13,14 @@ module.exports =
       mode: 'try'
     handler: (request) ->
       deleteUser = (user) ->
-        eventBroker.publish events.database.delete, { type: 'users', query }, _.partial respond, true, user.email
+        userHelper.delete request.query.user, _.partial respond, true, user.email
 
       respond = (isUserDeleted, emailAddress, error) ->
-        if error
-          return eventBroker.publish events.errors.report, {
-            request
-            action: "#{if isUserDeleted then 'delete' else 'update'} user"
-            message: error
-          }
-
-        request.reply.view 'content/unsubscribed.html', { emailAddress, isUserDeleted }
+        errorHelper.failOrContinue request, error, "#{if isUserDeleted then 'delete' else 'update'} user", ->
+          request.reply.view 'content/unsubscribed.html', { emailAddress, isUserDeleted }
 
       updateUser = (user) ->
-        eventBroker.publish events.database.update, {
-          type: 'users'
-          query
-          set: {}
-          unset:
-            job: null
-            isSaved: null
-        }, _.partial respond, false, user.email
+        userHelper.update request.query.user, {}, { job: null, isSaved: null }, _.partial respond, false, user.email
 
       query =
         name: request.query.user
