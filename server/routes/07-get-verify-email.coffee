@@ -1,5 +1,6 @@
 'use strict'
 
+_ = require 'underscore'
 userHelper = require './helpers/user'
 errorHelper = require './helpers/error'
 tokenHelper = require './helpers/token'
