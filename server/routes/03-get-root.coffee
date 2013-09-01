@@ -3,6 +3,7 @@
 check = require 'check-types'
 events = require '../events'
 eventBroker = require '../eventBroker'
+userHelper = require './helpers/user'
 errorHelper = require './helpers/error'
 httpErrorHelper = require './helpers/httpError'
 
@@ -21,7 +22,7 @@ module.exports =
         getRecentStars()
 
       getUser = ->
-        eventBroker.publish events.database.fetch, { type: 'users', query: { name: request.state.sid.user } }, receiveUser
+        userHelper.fetch request.state.sid.user, receiveUser
 
       receiveUser = (error, user) ->
         errorHelper.failOrContinue request, error, 'fetch user', ->

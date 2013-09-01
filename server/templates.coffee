@@ -3,11 +3,13 @@
 fs = require 'fs'
 path = require 'path'
 handlebars = require 'handlebars'
+log = require './log'
 
 layoutPath = path.resolve __dirname, '../views/layout.html'
 
 initialise = ->
-  log 'registering helpers'
+  log = log.initialise 'templates'
+  log.info 'initialising'
 
   handlebars.registerHelper 'block', blockHelper
   handlebars.registerHelper 'partial', partialHelper
@@ -16,28 +18,25 @@ initialise = ->
 
 blockHelper = (name, options) ->
   if typeof handlebars.partials[name] is 'string'
-    log "compiling partial #{name}"
+    log.info "compiling partial `#{name}`"
     handlebars.partials[name] = handlebars.compile handlebars.partials[name]
 
   partial = handlebars.partials[name] || options.fn;
 
-  log "rendering partial #{name}"
+  log.info "rendering partial `#{name}`"
   partial this, data: options.hash
 
 partialHelper = (name, options) ->
-  log "registering partial #{name}"
+  log.info "registering partial `#{name}`"
   handlebars.registerPartial name, options.fn
 
 registerLayout = (error, template) ->
   if error
-    log "fatal error reading layout.html, `#{error}`"
+    log.error "fatal error reading layout.html, `#{error}`"
     process.exit 1
 
-  log 'registering layout partial'
+  log.info 'registering layout partial'
   handlebars.registerPartial 'layout', handlebars.compile template
-
-log = (message) ->
-  console.log "server/templates: #{message}"
 
 module.exports = { initialise }
 

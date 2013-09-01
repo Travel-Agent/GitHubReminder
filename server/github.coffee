@@ -3,6 +3,7 @@
 https = require 'https'
 check = require 'check-types'
 eventBroker = require './eventBroker'
+log = require './log'
 
 packageInfo = require '../package.json'
 userAgent = "#{packageInfo.name}/#{packageInfo.version} (node.js/#{process.version})"
@@ -12,6 +13,8 @@ config = require('../config').oauth
 host = 'api.github.com'
 
 initialise = ->
+  log = log.initialise 'github'
+  log.info 'initialising'
   eventBroker.subscribe 'github', eventHandlers
 
 eventHandlers =
@@ -52,9 +55,9 @@ eventHandlers =
     getStarred event.getData(), 'created', 'asc', 100, true, event.respond
 
 request = (what, options, data, callback) ->
-  log "requesting #{what} from `#{options.path}`"
+  log.info "requesting #{what} from `#{options.path}`"
   req = https.request options, (response) ->
-    log "got #{what} response"
+    log[if response.statusCode >= 400 then 'error' else 'info'] "#{response.statusCode} result from `#{options.path}`"
 
     body = ''
 
@@ -69,13 +72,10 @@ request = (what, options, data, callback) ->
         body: if response.statusCode is 200 then JSON.parse body else body
 
   if data
-    log "writing data `#{data}`"
+    log.info "writing data `#{data}` to `#{options.path}`"
     req.write data
 
   req.end()
-
-log = (message) ->
-  console.log "server/github: #{message}"
 
 getStarred = (oauthToken, sort, direction, count, getAll, callback, results = [], path = '') ->
   request 'stars', {
@@ -89,7 +89,6 @@ getStarred = (oauthToken, sort, direction, count, getAll, callback, results = []
       response.body = results.concat response.body
       links = parsePaginationLinks response.headers.link
       if getAll and check.isUnemptyString links.next
-        # TODO: Consider discounting recently starred repos
         return getStarred '', '', '', '', true, callback, response.body, links.next.substr links.next.indexOf(host) + host.length
 
     callback response

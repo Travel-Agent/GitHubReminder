@@ -5,6 +5,7 @@ pubsub = require 'pub-sub'
 check = require 'check-types'
 events = require '../events'
 eventBroker = require '../eventBroker'
+userHelper = require './helpers/user'
 errorHelper = require './helpers/error'
 httpErrorHelper = require './helpers/httpError'
 config = require('../../config').oauth
@@ -30,7 +31,7 @@ module.exports =
           httpErrorHelper.failOrContinue request, response, getDbUser
 
       getDbUser = (user) ->
-        eventBroker.publish events.database.fetch, { type: 'users', query: { name: user.login } }, (error, dbUser) ->
+        userHelper.fetch user.login, (error, dbUser) ->
           receiveDbUser error, dbUser, user.login, user.avatar_url
 
       receiveDbUser = (error, user, name, avatar) ->
@@ -40,7 +41,7 @@ module.exports =
         errorHelper.failOrContinue request, error, 'fetch user', _.partial storeDbUser, { name, avatar, auth, frequency: 'weekly', isSaved: false }
 
       storeDbUser = (user) ->
-        eventBroker.publish events.database.insert, { type: 'users', instance: user }, (error) ->
+        userHelper.store user, (error) ->
           errorHelper.failOrContinue request, error, 'store user', _.partial respond, user
 
       respond = (user) ->

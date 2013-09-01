@@ -2,11 +2,15 @@
 
 initialise = (transport, config, subjectPrefix) ->
   (event) ->
+    text = ''
+    for own key, value of event.getData()
+      text += "#{key}: #{value}\n"
+
     transport.sendMail {
       from: config.from
       to: config.errors
-      subject: "#{subjectPrefix}   E R R O R !"
-      text: 'TODO'
+      subject: "#{subjectPrefix} ERROR!"
+      text
     }, event.respond
 
 module.exports = { initialise }
