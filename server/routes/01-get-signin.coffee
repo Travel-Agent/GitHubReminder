@@ -13,6 +13,6 @@ module.exports =
         return request.reply.redirect '/'
 
       request.reply.view 'content/signin.html',
-        # TODO: Generate state on the fly? Would need to store states in db
+        # TODO: Either use session id as state, or store state in session cookie
         url: "#{config.uri}?client_id=#{config.id}&scope=#{config.scope}&state=#{config.state}"
 
