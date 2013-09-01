@@ -4,7 +4,6 @@ initialise = (transport, config, subjectPrefix) ->
   (event) ->
     text = ''
     for own key, value of event.getData()
-      # TODO: Check
       text += "#{key}: #{value}\n"
 
     transport.sendMail {

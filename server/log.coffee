@@ -5,7 +5,6 @@ _ = require 'underscore'
 initialise = (origin) ->
   result = {}
   for own methodName, method of methods
-    # TODO: Check this
     result[methodName] = _.partial method, origin
   result
 
