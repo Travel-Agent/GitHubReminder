@@ -55,12 +55,22 @@ runJob = (error, user, after) ->
       httpFailOrContinue 'starred repositories', response, after, receiveStarredRepos
 
   receiveStarredRepos = (ignore, result) ->
-    repos = result
+    repos = pruneRepos result
 
     unless user.unsubscribe
       return getToken()
 
     sendReminder()
+
+  pruneRepos = (unpruned) ->
+    pruned = unpruned.filter (repo) ->
+      # TODO: Test, open to configuration
+      repo.created < Date.now() - weekly
+
+    if pruned.length is 0
+      unpruned
+    else
+      pruned
 
   getToken = ->
     eventBroker.publish events.tokens.generate, null, updateUser
@@ -118,7 +128,6 @@ httpFailOrContinue = (what, response, fail, after) ->
   after null, response.body
 
 selectRandomItem = (from) ->
-  # TODO: Consider discounting recent items? (should probably do that when fetching the repos)
   unless check.isArray from
     return from
 

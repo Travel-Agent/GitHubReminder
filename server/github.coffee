@@ -89,7 +89,6 @@ getStarred = (oauthToken, sort, direction, count, getAll, callback, results = []
       response.body = results.concat response.body
       links = parsePaginationLinks response.headers.link
       if getAll and check.isUnemptyString links.next
-        # TODO: Consider discounting recently starred repos
         return getStarred '', '', '', '', true, callback, response.body, links.next.substr links.next.indexOf(host) + host.length
 
     callback response
