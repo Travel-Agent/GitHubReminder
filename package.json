@@ -9,7 +9,8 @@
   "main": "./server",
   "scripts": {
       "compile-coffee": "./node_modules/.bin/coffee -c --output server server/index.coffee",
-      "compile-styl": "./node_modules/.bin/styl -w < client/styl/index.styl > public/GitHubReminder.css",
+      "concat-styl": "cat client/styl/constants.styl client/styl/elements.styl client/styl/classes.styl > client/styl/GitHubReminder.styl",
+      "compile-styl": "./node_modules/.bin/styl -w < client/styl/GitHubReminder.styl > public/GitHubReminder.css",
       "prefix-css": "./node_modules/.bin/autoprefixer -b 'last 3 versions, > 0.5%, ie 7' public/GitHubReminder.css",
       "build": "npm run compile-coffee && npm run compile styl && npm run prefix-css",
       "start": "node server"
