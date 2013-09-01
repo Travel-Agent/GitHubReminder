@@ -1,5 +1,6 @@
 'use strict'
 
+events = require './events'
 eventBroker = require './eventBroker'
 
 initialise = ->
@@ -7,10 +8,7 @@ initialise = ->
     report: (event) ->
 
       { request, action, message } = event.getData()
-
-      # TODO: send error email
-
-      request.reply.view 'content/error.html', {
+      data = {
         action
         message
         route: "#{request.route.method.toUpperCase()} #{request.route.path}"
@@ -20,6 +18,9 @@ initialise = ->
         user: request.state?.user
         referrer: request.info.referrer
       }
+
+      eventBroker.publish events.email.sendError, data
+      request.reply.view 'content/error.html', data
 
   eventBroker.subscribe 'errors', eventHandlers
 
