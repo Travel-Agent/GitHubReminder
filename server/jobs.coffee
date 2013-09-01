@@ -4,6 +4,7 @@ _ = require 'underscore'
 check = require 'check-types'
 events = require './events'
 eventBroker = require './eventBroker'
+log = require './log'
 
 # TODO: Do something with proper dates, time zones and so on
 hourly = 1000 * 60 * 60
@@ -15,16 +16,14 @@ frequencies = { daily, weekly, monthly }
 baseUri = 'http://githubreminder.org/'
 
 initialise = ->
-  log 'initialising'
+  log = log.initialise 'jobs'
+  log.info 'initialising'
   runDueJobs()
   clearExpiredVerifications()
   eventBroker.subscribe 'jobs', eventHandlers
 
-log = (message) ->
-  console.log "server/jobs: #{message}"
-
 runDueJobs = ->
-  log 'getting due jobs'
+  log.info 'getting due jobs'
   eventBroker.publish events.database.fetchAll, {
     type: 'users'
     query:
@@ -34,16 +33,17 @@ runDueJobs = ->
         $exists: false
   }, (error, users) ->
     if error
-      log "failed to get due jobs, reason `#{error}`"
+      log.error "failed to get due jobs, reason `#{error}`"
     else
-      log "got #{users.length} due jobs"
+      log.info "got #{users.length} due jobs"
       users.forEach (user, index) ->
-        log "running due job ##{index}"
+        log.info "running due job ##{index}:"
+        console.dir user
         runJob null, user, (error) ->
           if error
-            return log "failed due job ##{index}, reason `#{error}`"
+            return log.error "failed due job ##{index}, reason `#{error}`"
 
-          log "completed due job ##{index}"
+          log.info "completed due job ##{index}"
 
     setTimeout runDueJobs, hourly
 
@@ -70,6 +70,7 @@ runJob = (error, user, after) ->
     if pruned.length is 0
       unpruned
     else
+      log.info "pruned #{unpruned.length - pruned.length} recent repos from #{unpruned.length}"
       pruned
 
   getToken = ->
@@ -131,7 +132,9 @@ selectRandomItem = (from) ->
   unless check.isArray from
     return from
 
-  from[Math.floor Math.random() * from.length]
+  random = Math.floor Math.random() * from.length
+  log.info "generated random index #{random} from #{from.length} items"
+  from[random]
 
 clearExpiredVerifications = ->
   eventBroker.publish events.database.delete,
@@ -143,16 +146,16 @@ clearExpiredVerifications = ->
 
 eventHandlers =
   generate: (event) ->
-    log "generating job for `#{event.getData()}`"
+    log.info "generating job for `#{event.getData()}`"
     frequency = frequencies[event.getData()]
     if check.isNumber(frequency) is false
-      log "bad frequency `#{event.getData()}`"
+      log.error "bad frequency `#{event.getData()}`"
       return event.respond 'Invalid frequency'
-    log "returning job `#{Date.now() + frequency}`"
+    log.info "returning job `#{Date.now() + frequency}`"
     event.respond null, Date.now() + frequency
 
   force: (event) ->
-    log 'forcing immediate job'
+    log.info 'forcing immediate job'
     eventBroker.publish events.database.fetch, {
       type: 'users'
       query:

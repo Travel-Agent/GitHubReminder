@@ -2,6 +2,7 @@
 
 mongo = require 'mongodb'
 eventBroker = require './eventBroker'
+log = require './log'
 config = require('../config').database
 
 retryLimit = 3
@@ -10,12 +11,10 @@ indices =
   users: [ { spec: { name: 1 }, isUnique: 1 }, { spec: { job: 1 } }, { spec: { verifyExpire: 1 } } ]
 
 initialise = ->
-  log 'initialising'
+  log = log.initialise 'database'
+  log.info 'initialising'
   server = new mongo.Server config.host, config.port, auto_reconnect: true
   connect new mongo.Db config.name, server, w: 1
-
-log = (message) ->
-  console.log "server/database: #{message}"
 
 connect = (database) ->
   doAsync database, 'open', [], connected, true
@@ -23,7 +22,7 @@ connect = (database) ->
 connected = (connection, authenticate = true) ->
   authenticationHandler = (result) ->
     if result is false
-      log 'Failed to authenticate database credentials'
+      log.error 'failed to authenticate database credentials'
       return process.exit 1
     connected connection, false
 
@@ -68,9 +67,9 @@ connected = (connection, authenticate = true) ->
 
     # TODO: Do I need to maintain state here and check for an open connection before running queries?
     connection.on 'close', ->
-      log 'connection closed'
+      log.info 'connection closed'
     connection.on 'open', ->
-      log 'connection opened'
+      log.info 'connection opened'
 
   createEventHandler = (action, getArgs) ->
     (event) ->
@@ -100,7 +99,8 @@ connected = (connection, authenticate = true) ->
   getCollections()
 
 doAsync = (object, methodName, args, after, failOnError, retryCount = 0) ->
-  log "calling `#{methodName}` with arguments `#{args}`"
+  log.info "calling `#{methodName}` with following arguments:"
+  console.dir args
 
   after = after || ->
   argsCloned = args.slice 0
@@ -108,16 +108,16 @@ doAsync = (object, methodName, args, after, failOnError, retryCount = 0) ->
   argsCloned.push (error, result) ->
     if error
       if retryCount < retryLimit
-        log "`#{methodName}` returned error `#{error}`"
+        log.error "`#{methodName}` returned error `#{error}`"
         return doAsync object, methodName, args, after, failOnError, retryCount + 1
 
       if failOnError
-        log 'fatal error, exiting'
+        log.error 'fatal, exiting'
         process.exit 1
 
       after error, null
 
-    log "`#{methodName}` returned ok"
+    log.info "`#{methodName}` returned ok"
 
     if failOnError
       return after result

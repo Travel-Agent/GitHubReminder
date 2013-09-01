@@ -1,9 +1,11 @@
 'use strict'
 
-console.log "$PORT is `#{process.env.PORT}`"
-
 coffee = require 'coffee-script'
 
+log = require './log'
+log = log.initialise 'server'
+
+log.info 'loading server modules'
 modules = [ 'templates', 'database', 'github', 'jobs', 'email', 'tokens', 'errors' ]
 modules.forEach (m) ->
   require("./#{m}").initialise()
@@ -12,9 +14,11 @@ hapi = require 'hapi'
 config = require '../config'
 routes = require './routes'
 
+host = process.env.HOST || 'localhost'
 port = parseInt process.env.PORT || '8080'
 
-server = hapi.createServer process.env.HOST || 'localhost', port,
+log.info "creating server on #{host}:#{port}"
+server = hapi.createServer host, port,
   views:
     path: 'views'
     engines:
@@ -27,9 +31,10 @@ server = hapi.createServer process.env.HOST || 'localhost', port,
     appendNext: false
   cache: config.sessions
 
+log.info 'initialising routes'
 routes.initialise server
 
-console.log "server: awaiting connections on port #{port}"
+log.info 'starting server'
 
 server.start()
 
