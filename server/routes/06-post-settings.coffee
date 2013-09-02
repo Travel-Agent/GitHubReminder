@@ -7,6 +7,8 @@ eventBroker = require '../eventBroker'
 userHelper = require './helpers/user'
 errorHelper = require './helpers/error'
 
+day = 24 * 60 * 60 * 1000
+
 module.exports =
   path: '/settings'
   method: 'POST'
@@ -31,7 +33,7 @@ module.exports =
           emailAddress = request.payload.otherEmail
           eventBroker.publish events.tokens.generate, null, (t) ->
             token = t
-            updateUser { verify: token, verifyExpire: Date.now() }, verifyOtherEmail
+            updateUser { verify: token, verifyExpire: Date.now() + day}, verifyOtherEmail
         else
           emailAddress = request.payload.email
           generateJob()
