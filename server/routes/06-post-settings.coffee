@@ -59,7 +59,7 @@ module.exports =
           errorHelper.failOrContinue request, error, 'update user', _.partial finish, true, '/'
 
       updateUser = (fields, after) ->
-        userHelper.update name, _.defaults(fields,
+        userHelper.update request.state.sid.user, _.defaults(fields,
           email: emailAddress
           frequency: request.payload.frequency
           isSaved: true
