@@ -128,7 +128,7 @@ httpFailOrContinue = (what, response, fail, after) ->
 
   after null, response.body
 
-selectRandomItem = (from) ->
+selectRandom = (from) ->
   unless check.isArray from
     return from
 
