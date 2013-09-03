@@ -102,7 +102,7 @@ parsePaginationLinks = (links) ->
 parsePaginationLink = (link) ->
   parts = link.split ';'
   url = parts[0].trim()
-  url = url.substring 1, url.length - 2
+  url = url.substring 1, url.length - 1
   key = parts[1].substring parts[1].indexOf('"') + 1, parts[1].lastIndexOf '"'
   { key, url }
 
