@@ -55,23 +55,12 @@ runJob = (error, user, after) ->
       httpFailOrContinue 'starred repositories', response, after, receiveStarredRepos
 
   receiveStarredRepos = (ignore, result) ->
-    repos = pruneRepos result
+    repos = result
 
     unless user.unsubscribe
       return getToken()
 
     sendReminder()
-
-  pruneRepos = (unpruned) ->
-    pruned = unpruned.filter (repo) ->
-      # TODO: Test, open to configuration
-      repo.created < Date.now() - weekly
-
-    if pruned.length is 0
-      unpruned
-    else
-      log.info "pruned #{unpruned.length - pruned.length} recent repos from #{unpruned.length}"
-      pruned
 
   getToken = ->
     eventBroker.publish events.tokens.generate, null, updateUser
@@ -88,7 +77,7 @@ runJob = (error, user, after) ->
       failOrContinue error, result, after, sendReminder
 
   sendReminder = ->
-    unsubscribe = "#{baseUri}/unsubscribe?user=#{user.name}&token=#{user.unsubscribe}"
+    unsubscribe = "#{baseUri}unsubscribe?user=#{user.name}&token=#{user.unsubscribe}"
     eventBroker.publish events.email.sendReminder, {
       to: user.email
       frequency: user.frequency
