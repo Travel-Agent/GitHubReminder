@@ -47,7 +47,6 @@ module.exports =
             email.verified is true
           ).map (email) ->
             address: email.email
-            isSelected: currentUser.email is email.email
           after()
         , onError
 
@@ -61,6 +60,8 @@ module.exports =
         , onError
 
       respond = ->
+        currentEmails.forEach (email) ->
+          email.isSelected = email.address is currentUser.email
         isAwaitingVerification = request.query.verification is 'yes'
         isOtherEmail = currentUser.isSaved and currentEmails.every (email) ->
           email.isSelected is false
