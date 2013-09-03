@@ -14,11 +14,9 @@ initialise = (transport, config, subjectPrefix) ->
 
            This is your #{frequency} GitHub reminder.
 
-           #{repo.full_name}
-
-           #{repo.description}
-
-           Language: #{repo.language}
+           Repository: #{repo.full_name}
+           Description: #{repo.description || ''}
+           Language: #{repo.language || ''}
            Stars: #{repo.watchers_count}
            Forks: #{repo.forks_count}
 
@@ -27,16 +25,14 @@ initialise = (transport, config, subjectPrefix) ->
            Cheerio,
            the reminder bot.
 
+           --
            To change your settings:
-
            #{uris.settings}
 
            To unsubscribe from these emails:
-
            #{uris.unsubscribe}
 
            To unsubscribe and remove all of your data from my database:
-
            #{uris.clobber}
            """
 
