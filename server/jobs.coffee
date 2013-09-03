@@ -87,8 +87,8 @@ runJob = (error, user, after) ->
         unsubscribe
         clobber: "#{unsubscribe}&clobber=yes"
       }
-    }, (response) ->
-      httpFailOrContinue 'reminder email', response, after, generateJob
+    }, (error, response) ->
+      failOrContinue error, response, after, generateJob
 
   generateJob = ->
     eventBroker.publish events.jobs.generate, user.frequency, (error, job) ->
