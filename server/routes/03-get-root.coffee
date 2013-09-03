@@ -26,17 +26,23 @@ module.exports =
 
       receiveUser = (error, user) ->
         errorHelper.failOrContinue request, error, 'fetch user', ->
+          if user is null
+            return handleDeletedUser()
           currentUser = user
           after()
         , onError
+
+      handleDeletedUser = ->
+        onError()
+        request.reply.redirect '/signout'
+
+      onError = ->
+        outstandingRequests = -1
 
       after = ->
         outstandingRequests -= 1
         if outstandingRequests is 0
           respond()
-
-      onError = ->
-        outstandingRequests = -1
 
       getEmails = (user) ->
         eventBroker.publish events.github.getEmail, request.state.sid.auth, receiveEmails
