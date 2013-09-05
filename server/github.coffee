@@ -49,7 +49,7 @@ eventHandlers =
     }, null, event.respond
 
   getStarredRecent: (event) ->
-    getStarred event.getData(), 'created', 'desc', 5, false, event.respond
+    getStarred event.getData(), 'created', 'desc', 3, false, event.respond
 
   getStarredAll: (event) ->
     getStarred event.getData(), 'created', 'asc', 100, true, event.respond

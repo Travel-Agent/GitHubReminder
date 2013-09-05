@@ -3,19 +3,18 @@
 <section>
   <h2>Your account</h2>
 
-  <p>{{user}}</p>
-
   <img src="{{avatar}}" class="avatar" alt=""/>
+
+  <p class="username">{{user}}</p>
 
   <h3>Recently starred repositories</h3>
 
   <ul>
     {{#each repos}}
     <li>
-      <a href="{{html_url}}">
-        <h4>{{full_name}}</h4>
-
-        <p>{{description}}</p>
+      <a class="repo" href="{{html_url}}" target="_blank">
+        <h4>{{full_name}}</h4>:
+        <p class="description">{{description}}</p>
 
         <ul>
           <li>
