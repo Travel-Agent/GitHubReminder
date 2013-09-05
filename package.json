@@ -1,6 +1,6 @@
 {
   "name": "GitHubReminder",
-  "private": true,
+  "description": "Source code for https://githubreminder.org/",
   "version": "0.0.1",
   "author": "Phil Booth <pmbooth@gmail.com",
   "contributors": [
