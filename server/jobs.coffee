@@ -13,8 +13,6 @@ weekly = daily * 7
 monthly = (weekly * 52) / 12
 frequencies = { daily, weekly, monthly }
 
-baseUri = 'http://githubreminder.org/'
-
 initialise = ->
   log = log.initialise 'jobs'
   log.info 'initialising'

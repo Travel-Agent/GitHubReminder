@@ -26,7 +26,7 @@ server = hapi.createServer host, port,
   auth:
     scheme: 'cookie'
     password: config.cookies.password
-    isSecure: false # TODO: Investigate SSL, set to true
+    isSecure: true
     redirectTo: '/signin'
     appendNext: false
   cache: config.sessions
