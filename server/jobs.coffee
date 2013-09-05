@@ -66,6 +66,7 @@ runJob = (error, user, after) ->
     eventBroker.publish events.tokens.generate, null, updateUser
 
   updateUser = (token) ->
+    user.unsubscribe = token
     eventBroker.publish events.database.update, {
       type: 'users'
       query:
