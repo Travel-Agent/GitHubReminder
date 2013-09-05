@@ -39,7 +39,7 @@
     auth: {
       scheme: 'cookie',
       password: config.cookies.password,
-      isSecure: false,
+      isSecure: true,
       redirectTo: '/signin',
       appendNext: false
     },
