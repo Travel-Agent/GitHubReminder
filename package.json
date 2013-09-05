@@ -10,7 +10,7 @@
   "scripts": {
       "compile-coffee": "./node_modules/.bin/coffee -c --output server server/index.coffee",
       "compile-stylus": "./node_modules/.bin/stylus -o public client/style/GitHubReminder.styl",
-      "prefix-css": "./node_modules/.bin/autoprefixer -b 'last 5 versions, > 0.5%, ie 7' public/GitHubReminder.css",
+      "prefix-css": "./node_modules/.bin/autoprefixer -b 'last 3 versions, > 0.5%, ie 7' public/GitHubReminder.css",
       "compress-css": "./node_modules/.bin/cleancss -e -o public/GitHubReminder.css public/GitHubReminder.css",
       "build": "npm run compile-coffee && npm run compile-stylus && npm run prefix-css && npm run compress-css",
       "start": "node server"
