@@ -1,12 +1,18 @@
 'use strict'
 
-eventBroker = require './eventBroker'
 uuid = require 'uuid'
+eventBroker = require './eventBroker'
+log = require './log'
 
 initialise = ->
+  log = log.initialise 'tokens'
+  log.info 'initialising'
+
   eventHandlers =
     generate: (event) ->
-      event.respond uuid.v4().replace /-/g, ''
+      token = uuid.v4().replace /-/g, ''
+      log.info "returning token #{token}"
+      event.respond token
 
   eventBroker.subscribe 'tokens', eventHandlers
 

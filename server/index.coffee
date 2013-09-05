@@ -16,9 +16,11 @@ routes = require './routes'
 
 host = process.env.HOST || 'localhost'
 port = parseInt process.env.PORT || '8080'
+location = config.baseUri || "http://#{host}:#{port}"
 
-log.info "creating server on #{host}:#{port}"
-server = hapi.createServer host, port,
+log.info "creating server for #{location}/ on #{host}:#{port}"
+server = hapi.createServer host, port, {
+  location
   views:
     path: 'views'
     engines:
@@ -26,10 +28,11 @@ server = hapi.createServer host, port,
   auth:
     scheme: 'cookie'
     password: config.cookies.password
-    isSecure: false # TODO: Investigate SSL, set to true
+    isSecure: location.substr(0, 6) is 'https:'
     redirectTo: '/signin'
     appendNext: false
   cache: config.sessions
+}
 
 log.info 'initialising routes'
 routes.initialise server

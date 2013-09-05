@@ -5,7 +5,7 @@ module.exports =
   method: 'GET'
   config:
     auth: true
-    handler: ->
-      this.auth.session.clear()
-      this.reply.redirect '/'
+    handler: (request) ->
+      request.auth.session.clear()
+      request.reply.redirect '/'
 

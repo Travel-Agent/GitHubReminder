@@ -13,8 +13,6 @@ weekly = daily * 7
 monthly = (weekly * 52) / 12
 frequencies = { daily, weekly, monthly }
 
-baseUri = 'http://githubreminder.org/'
-
 initialise = ->
   log = log.initialise 'jobs'
   log.info 'initialising'
@@ -55,28 +53,18 @@ runJob = (error, user, after) ->
       httpFailOrContinue 'starred repositories', response, after, receiveStarredRepos
 
   receiveStarredRepos = (ignore, result) ->
-    repos = pruneRepos result
+    repos = result
 
     unless user.unsubscribe
       return getToken()
 
     sendReminder()
 
-  pruneRepos = (unpruned) ->
-    pruned = unpruned.filter (repo) ->
-      # TODO: Test, open to configuration
-      repo.created < Date.now() - weekly
-
-    if pruned.length is 0
-      unpruned
-    else
-      log.info "pruned #{unpruned.length - pruned.length} recent repos from #{unpruned.length}"
-      pruned
-
   getToken = ->
     eventBroker.publish events.tokens.generate, null, updateUser
 
   updateUser = (token) ->
+    user.unsubscribe = token
     eventBroker.publish events.database.update, {
       type: 'users'
       query:
@@ -88,18 +76,18 @@ runJob = (error, user, after) ->
       failOrContinue error, result, after, sendReminder
 
   sendReminder = ->
-    unsubscribe = "#{baseUri}/unsubscribe?user=#{user.name}&token=#{user.unsubscribe}"
+    unsubscribe = "unsubscribe?user=#{user.name}&token=#{user.unsubscribe}"
     eventBroker.publish events.email.sendReminder, {
       to: user.email
       frequency: user.frequency
       repo: selectRandom repos
-      uris: {
-        settings: baseUri
+      paths: {
+        settings: ''
         unsubscribe
         clobber: "#{unsubscribe}&clobber=yes"
       }
-    }, (response) ->
-      httpFailOrContinue 'reminder email', response, after, generateJob
+    }, (error, response) ->
+      failOrContinue error, response, after, generateJob
 
   generateJob = ->
     eventBroker.publish events.jobs.generate, user.frequency, (error, job) ->
@@ -128,7 +116,7 @@ httpFailOrContinue = (what, response, fail, after) ->
 
   after null, response.body
 
-selectRandomItem = (from) ->
+selectRandom = (from) ->
   unless check.isArray from
     return from
 
