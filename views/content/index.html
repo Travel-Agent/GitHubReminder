@@ -94,8 +94,8 @@
     <input class="inline-control submit" type="submit" value="Save"/>
   </form>
 
-  {{#if isSaved}}
-  <a href="/cancel">Cancel reminders</a>
+  {{#if isSubscribed}}
+  <a class="cancel" href="/cancel">Cancel reminders</a>
   {{/if}}
 </section>
 {{/partial}}

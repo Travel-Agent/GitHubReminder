@@ -68,12 +68,12 @@ module.exports =
       respond = ->
         currentEmails.forEach (email) ->
           email.isSelected = email.address is currentUser.email
-        isAwaitingVerification = request.query.verification is 'yes'
+        isAwaitingVerification = check.isUnemptyString currentUser.verify
         isOtherEmail = currentUser.isSaved and currentEmails.every (email) ->
           email.isSelected is false
         if isOtherEmail
           if isAwaitingVerification
-            otherEmail = request.query.emailAddress
+            otherEmail = currentUser.verifyEmail
           else
             otherEmail = currentUser.email
         else
@@ -92,7 +92,8 @@ module.exports =
           isFailed: request.query.saved is 'no'
           reason: request.query.reason
           isAwaitingVerification
-          verificationEmail: request.query.emailAddress
+          verificationEmail: currentUser.verifyEmail
+          isSubscribed: currentUser.isSaved and !isAwaitingVerification
         }
 
       begin()

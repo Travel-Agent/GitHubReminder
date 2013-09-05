@@ -33,7 +33,7 @@ module.exports =
           emailAddress = request.payload.otherEmail
           eventBroker.publish events.tokens.generate, null, (t) ->
             token = t
-            updateUser { verify: token, verifyExpire: Date.now() + day}, verifyOtherEmail
+            updateUser { verify: token, verifyExpire: Date.now() + day, verifyEmail: emailAddress }, verifyOtherEmail
         else
           emailAddress = request.payload.email
           generateJob()
@@ -44,7 +44,7 @@ module.exports =
           emailAddress
           token
         }, (error) ->
-          next = _.partial finish, false, "/?verification=yes&emailAddress=#{encodeURIComponent emailAddress}"
+          next = _.partial finish, false, '/'
           errorHelper.failOrContinue request, error, 'send verification email', next
 
       finish = (allowImmediate, redirectPath) ->

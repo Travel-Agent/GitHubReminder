@@ -17,7 +17,8 @@ module.exports =
 
       respond = (isUserDeleted, emailAddress, error) ->
         errorHelper.failOrContinue request, error, "#{if isUserDeleted then 'delete' else 'update'} user", ->
-          request.auth.session.clear()
+          if isUserDeleted
+            request.auth.session.clear()
           request.reply.view 'content/unsubscribed.html', { emailAddress, isUserDeleted }
 
       updateUser = (user) ->
