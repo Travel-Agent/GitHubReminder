@@ -13,6 +13,5 @@ module.exports =
         return request.reply.redirect '/'
 
       request.reply.view 'content/signin.html',
-        # TODO: Either use session id as state, or store state in session cookie
-        url: "#{config.uri}?client_id=#{config.id}&scope=#{config.scope}&state=#{config.state}"
+        url: "#{config.uri}?client_id=#{encodeURIComponent config.id}&scope=#{encodeURIComponent config.scope}&state=#{encodeURIComponent request.state['connect.sid']}"
 

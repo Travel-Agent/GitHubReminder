@@ -20,11 +20,10 @@ module.exports =
       auth = undefined
 
       getToken = ->
-        if request.query.state is config.state
-          eventBroker.publish events.github.getToken, request.query.code, (response) ->
-            httpErrorHelper.failOrContinue request, response, (body) ->
-              auth = body.access_token
-              getGhUser()
+        eventBroker.publish events.github.getToken, request.query.code, (response) ->
+          httpErrorHelper.failOrContinue request, response, (body) ->
+            auth = body.access_token
+            getGhUser()
 
       getGhUser = ->
         eventBroker.publish events.github.getUser, auth, (response) ->
@@ -50,6 +49,9 @@ module.exports =
 
       if request.query.error
         return errorHelper.fail request, 'OAuth', "Error: #{request.query.error}"
+
+      unless request.query.state is request.state['connect.sid']
+        return errorHelper.fail request, 'OAuth', 'Error: state mismatch'
 
       getToken()
 
