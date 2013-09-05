@@ -18,7 +18,8 @@ initialise = ->
 
 blockHelper = (name, options) ->
   if typeof handlebars.partials[name] is 'string'
-    log.info "compiling partial `#{name}`"
+    log.info "compiling partial `#{name}` with options:"
+    console.dir options
     handlebars.partials[name] = handlebars.compile handlebars.partials[name]
 
   partial = handlebars.partials[name] || options.fn;
@@ -27,7 +28,8 @@ blockHelper = (name, options) ->
   partial this, data: options.hash
 
 partialHelper = (name, options) ->
-  log.info "registering partial `#{name}`"
+  log.info "registering partial `#{name}` with options:"
+  console.dir options
   handlebars.registerPartial name, options.fn
 
 registerLayout = (error, template) ->
