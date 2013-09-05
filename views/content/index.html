@@ -15,23 +15,23 @@
     {{#each repos}}
     <li>
       <a href="{{html_url}}">
-        <h3>{{full_name}}</h3>
+        <h4>{{full_name}}</h4>
 
-        <p>{{description}}<p>
+        <p>{{description}}</p>
 
         <ul>
           <li>
-            <h4>Language</h4>:
+            <h5>Language</h5>:
             {{language}}
           </li>
 
           <li>
-            <h4>Stars</h4>:
+            <h5>Stars</h5>:
             {{watchers_count}}
           </li>
 
           <li>
-            <h4>Forks</h4>:
+            <h5>Forks</h5>:
             {{forks_count}}
           </li>
         </ul>
