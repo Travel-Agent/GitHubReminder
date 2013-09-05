@@ -9,10 +9,10 @@
   "main": "./server",
   "scripts": {
       "compile-coffee": "./node_modules/.bin/coffee -c --output server server/index.coffee",
-      "concat-styl": "cat client/styl/constants.styl client/styl/elements.styl client/styl/classes.styl > client/styl/GitHubReminder.styl",
-      "compile-styl": "./node_modules/.bin/styl -w < client/styl/GitHubReminder.styl > public/GitHubReminder.css",
-      "prefix-css": "./node_modules/.bin/autoprefixer -b 'last 3 versions, > 0.5%, ie 7' public/GitHubReminder.css",
-      "build": "npm run compile-coffee && npm run compile styl && npm run prefix-css",
+      "compile-stylus": "./node_modules/.bin/stylus -o public client/style/GitHubReminder.styl",
+      "prefix-css": "./node_modules/.bin/autoprefixer -b 'last 5 versions, > 0.5%, ie 7' public/GitHubReminder.css",
+      "compress-css": "./node_modules/.bin/cleancss -e -o public/GitHubReminder.css public/GitHubReminder.css",
+      "build": "npm run compile-coffee && npm run compile-stylus && npm run prefix-css && npm run compress-css",
       "start": "node server"
   },
   "dependencies": {
@@ -25,8 +25,9 @@
     "nodemailer": "0.5.x",
     "underscore": "1.5.x",
     "uuid": "1.4.x",
-    "styl": "0.2.x",
-    "autoprefixer": "0.7"
+    "stylus": "0.37.x",
+    "autoprefixer": "0.8.x",
+    "clean-css": "1.0.x"
   },
   "devDependencies": {
   },
