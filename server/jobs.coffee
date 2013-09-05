@@ -77,13 +77,13 @@ runJob = (error, user, after) ->
       failOrContinue error, result, after, sendReminder
 
   sendReminder = ->
-    unsubscribe = "#{baseUri}unsubscribe?user=#{user.name}&token=#{user.unsubscribe}"
+    unsubscribe = "unsubscribe?user=#{user.name}&token=#{user.unsubscribe}"
     eventBroker.publish events.email.sendReminder, {
       to: user.email
       frequency: user.frequency
       repo: selectRandom repos
-      uris: {
-        settings: baseUri
+      paths: {
+        settings: ''
         unsubscribe
         clobber: "#{unsubscribe}&clobber=yes"
       }

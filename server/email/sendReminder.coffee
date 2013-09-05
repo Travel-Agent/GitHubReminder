@@ -7,7 +7,7 @@ initialise = (transport, config, subjectPrefix) ->
   log.info 'initialising'
 
   (event) ->
-    { to, frequency, repo, uris } = event.getData()
+    { to, frequency, repo, paths } = event.getData()
 
     text = """
            Hello,
@@ -27,13 +27,13 @@ initialise = (transport, config, subjectPrefix) ->
 
            --
            To change your settings:
-           #{uris.settings}
+           #{config.baseUri}#{paths.settings}
 
            To unsubscribe from these emails:
-           #{uris.unsubscribe}
+           #{config.baseUri}#{paths.unsubscribe}
 
            To unsubscribe and remove all of your data from my database:
-           #{uris.clobber}
+           #{config.baseUri}#{paths.clobber}
            """
 
     log.info "sending email to #{to}:"
