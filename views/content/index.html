@@ -37,7 +37,7 @@
     {{/each}}
   </ul>
 
-  <p>
+  <p class="signout">
     Wrong account?
     <a href="/signout">Sign out</a>.
   </p>
@@ -63,7 +63,7 @@
   </p>
   {{/if}}
 
-  <form method="POST" action="/settings">
+  <form class="clearfix" method="POST" action="/settings">
     <label for="select-email">Email address</label>
     <select name="email" id="select-email">
       {{#email}}
@@ -86,10 +86,12 @@
     <!-- TODO: Offer setting reminder time (in user's time zone) -->
     <!-- TODO: Offer setting reminder day -->
 
-    <input type="checkbox" name="immediate" id="input-checkbox" value="true"/>
-    <label for="input-immediate">Send a reminder immediately?</label>
+    <div class="control">
+      <input class="inline-control control-part checkbox" type="checkbox" name="immediate" id="input-checkbox" value="true"/>
+      <label class="control-part" for="input-immediate">Send a reminder immediately?</label>
+    </div>
 
-    <input type="submit" value="Save"/>
+    <input class="inline-control submit" type="submit" value="Save"/>
   </form>
 
   {{#if isSaved}}
