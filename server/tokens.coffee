@@ -10,9 +10,8 @@ initialise = ->
 
   eventHandlers =
     generate: (event) ->
-      uuid = uuid.v4()
-      token = uuid.replace /-/g, ''
-      log.info "returning token #{token} from uuid #{uuid}"
+      token = uuid.v4().replace /-/g, ''
+      log.info "returning token #{token}"
       event.respond token
 
   eventBroker.subscribe 'tokens', eventHandlers
