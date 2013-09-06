@@ -65,14 +65,14 @@
 
   <form class="clearfix" method="POST" action="/settings">
     <label for="select-email">Email address</label>
-    <select name="email" id="select-email">
+    <select name="email" id="select-email" data-visibility-control="#input-email,#input-email-label" data-visibility-option="other">
       {{#email}}
       <option value="{{address}}"{{#if isSelected}} selected="selected"{{/if}}>{{address}}</option>
       {{/email}}
       <option value="other"{{#if isOtherEmail}} selected="selected"{{/if}}>Other</option>
     </select>
 
-    <label for="input-email">Other email address</label>
+    <label for="input-email" id="input-email-label">Other email address</label>
     <input type="text" name="otherEmail" id="input-email" value="{{otherEmail}}"/>
 
     <label for="select-frequency">Frequency</label>

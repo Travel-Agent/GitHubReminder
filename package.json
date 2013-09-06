@@ -8,11 +8,13 @@
   ],
   "main": "./server",
   "scripts": {
-      "compile-coffee": "./node_modules/.bin/coffee -c --output server server/index.coffee",
+      "compile-coffee-back": "./node_modules/.bin/coffee -c --output server server/index.coffee",
+      "compile-coffee-front": "./node_modules/.bin/coffee -c --output client/lib client/src/GitHubReminder.coffee",
+      "compress-coffee-front": "./node_modules/.bin/uglifyjs -c --output public/lib/GitHubReminder.js client/lib/GitHubReminder.js",
       "compile-stylus": "./node_modules/.bin/stylus -o public client/style/GitHubReminder.styl",
       "prefix-css": "./node_modules/.bin/autoprefixer -b 'last 3 versions, > 0.5%, ie 7' public/GitHubReminder.css",
       "compress-css": "./node_modules/.bin/cleancss -e -o public/GitHubReminder.css public/GitHubReminder.css",
-      "build": "npm run compile-coffee && npm run compile-stylus && npm run prefix-css && npm run compress-css",
+      "build": "npm run compile-coffee-back && npm run compile-coffee-front && npm run compress-coffee-front && npm run compile-stylus && npm run prefix-css && npm run compress-css",
       "start": "node server"
   },
   "dependencies": {
@@ -24,12 +26,13 @@
     "check-types": "0.6.x",
     "nodemailer": "0.5.x",
     "underscore": "1.5.x",
-    "uuid": "1.4.x",
+    "uuid": "1.4.x"
+  },
+  "devDependencies": {
+    "uglify-js": "2.4.x",
     "stylus": "0.37.x",
     "autoprefixer": "0.8.x",
     "clean-css": "1.0.x"
-  },
-  "devDependencies": {
   },
   "engines": {
     "node": "0.10.x"
