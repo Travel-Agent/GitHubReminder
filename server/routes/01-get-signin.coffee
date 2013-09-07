@@ -1,5 +1,7 @@
 'use strict'
 
+_ = require 'underscore'
+tokenHelper = require './helpers/token'
 config = require('../../config').oauth
 
 module.exports =
@@ -12,6 +14,9 @@ module.exports =
       if request.auth.isAuthenticated
         return request.reply.redirect '/'
 
-      request.reply.view 'content/signin.html',
-        url: "#{config.uri}?client_id=#{encodeURIComponent config.id}&scope=#{encodeURIComponent config.scope}&state=#{encodeURIComponent request.state['connect.sid']}"
+      tokenHelper.generate (token) ->
+        request.auth.session.set _.extend request.state, { token }
+
+        request.reply.view 'content/signin.html',
+          url: "#{config.uri}?client_id=#{encodeURIComponent config.id}&scope=#{encodeURIComponent config.scope}&state=#{encodeURIComponent token}"
 

@@ -20,5 +20,8 @@ check = (request, tokenType, callback) ->
 
   getUser()
 
-module.exports = { check }
+generate = (callback) ->
+  eventBroker.publish events.tokens.generate, null, callback
+
+module.exports = { check, generate }
 
