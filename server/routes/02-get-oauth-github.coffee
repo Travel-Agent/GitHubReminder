@@ -44,7 +44,7 @@ module.exports =
           errorHelper.failOrContinue request, error, 'store user', _.partial respond, user
 
       respond = (user) ->
-        request.auth.session.set _.extend state, { user: user.name, auth }
+        request.auth.session.set _.extend request.state, { user: user.name, auth }
         request.reply.redirect '/'
 
       if request.query.error
