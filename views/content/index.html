@@ -13,21 +13,22 @@
     {{#each repos}}
     <li>
       <a class="repo" href="{{html_url}}" target="_blank">
-        <h4>{{full_name}}</h4>:
+        <h4>{{full_name}}</h4>
+
         <p class="description">{{description}}</p>
 
         <ul>
-          <li>
+          <li class="stat">
             <h5>Language</h5>:
             {{language}}
           </li>
 
-          <li>
+          <li class="stat">
             <h5>Stars</h5>:
             {{watchers_count}}
           </li>
 
-          <li>
+          <li class="stat">
             <h5>Forks</h5>:
             {{forks_count}}
           </li>
