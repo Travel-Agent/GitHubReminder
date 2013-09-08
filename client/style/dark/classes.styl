@@ -22,7 +22,7 @@
   box-shadow 0 1px 1px darken(bg-action, 30%)
 
   &:active
-    vertical-gradient darken(bg-action, 20%), lighten(bg-action, 20%), bg-action
+    clear-vertical-gradient
 
 .smallprint
   margin-top 3em
@@ -30,6 +30,16 @@
 
 .footer
   margin-top -0.8em
+
+.error
+  padding 1em 0
+  border-radius 5px
+  overflow hidden
+  background-color bg-error
+  color fg-error
+
+  &::selection
+    background-color bg-error-selection
 
 .avatar
   float left

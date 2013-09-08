@@ -13,8 +13,9 @@ initialise = ->
         message
         route: "#{request.route.method.toUpperCase()} #{request.route.path}"
         host: request.info.host
-        path: request.path
         method: request.method.toUpperCase()
+        path: request.path
+        query: request.url.search
         user: request.state?.user
         referrer: request.info.referrer
       }
