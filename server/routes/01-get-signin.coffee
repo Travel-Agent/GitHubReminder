@@ -15,6 +15,7 @@ module.exports =
         console.log '01 BEFORE SET:'
         console.dir request.state
 
+        # TODO: INVESTIGATE WHY THIS CALL APPEARS TO CAUSE THE SERVER TO CRASH WITH 'Error: socket hang up' MESSAGE
         request.auth.session.set _.extend request.state, { token }
         setTimeout _.partial(respond, token), 0
 
