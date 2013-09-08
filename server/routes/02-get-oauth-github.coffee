@@ -50,7 +50,7 @@ module.exports =
       if request.query.error
         return errorHelper.fail request, 'OAuth', "Error: #{request.query.error}"
 
-      unless request.query.state is request.state.sid.token
+      unless request.query.state is request.state.sid?.token
         return errorHelper.fail request, 'OAuth', 'Error: state mismatch'
 
       getToken()
