@@ -18,7 +18,7 @@
       "prefix-css-dark": "./node_modules/.bin/autoprefixer -b 'last 3 versions, > 0.5%, ie 7' public/style/dark.css",
       "prefix-css": "npm run prefix-css-console && npm run prefix-css-dark",
       "compress-css-console": "./node_modules/.bin/cleancss -e -o public/style/console.css public/style/console.css",
-      "compress-css-dark": "./node_modules/.bin/cleancss -e -o public/style/console.css public/style/dark.css",
+      "compress-css-dark": "./node_modules/.bin/cleancss -e -o public/style/dark.css public/style/dark.css",
       "compress-css": "npm run compress-css-console && npm run compress-css-dark",
       "build": "npm run compile-coffee-back && npm run compile-coffee-front && npm run compress-coffee-front && npm run compile-stylus && npm run prefix-css && npm run compress-css",
       "start": "node server"
