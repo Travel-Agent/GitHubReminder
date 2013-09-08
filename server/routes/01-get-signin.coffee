@@ -11,18 +11,32 @@ module.exports =
     auth:
       mode: 'try'
     handler: (request) ->
-      console.log '* 01'
-      if request.auth.isAuthenticated
-        console.log '* 02'
-        return request.reply.redirect '/'
+      generateToken = ->
+        console.log 'AFTER CLEAR:'
+        console.dir request.state
 
-      console.log '* 03'
-      tokenHelper.generate (token) ->
-        console.log '* 04'
+        tokenHelper.generate receiveToken
+
+      receiveToken = (token) ->
+        console.log 'BEFORE SET:'
+        console.dir request.state
+
         request.auth.session.set _.extend request.state, { token }
+        setTimeout _.partial(respond, token), 0
 
-        console.log '* 05'
+      respond = (token) ->
+        console.log 'AFTER SET:'
+        console.dir request.state
+
         request.reply.view 'content/signin.html',
           url: "#{config.uri}?client_id=#{encodeURIComponent config.id}&scope=#{encodeURIComponent config.scope}&state=#{encodeURIComponent token}"
-        console.log '* 06'
+
+      if request.auth.isAuthenticated
+        return request.reply.redirect '/'
+
+      console.log 'BEFORE CLEAR:'
+      console.dir request.state
+
+      request.auth.session.clear()
+      setTimeout generateToken, 0
 
