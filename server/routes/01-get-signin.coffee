@@ -19,7 +19,7 @@ module.exports =
       console.log '* 03'
       tokenHelper.generate (token) ->
         console.log '* 04'
-        #request.auth.session.set _.extend request.state, { token }
+        request.auth.session.set _.extend request.state, { token }
 
         console.log '* 05'
         request.reply.view 'content/signin.html',
