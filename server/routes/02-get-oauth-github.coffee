@@ -44,7 +44,7 @@ module.exports =
           errorHelper.failOrContinue request, error, 'store user', _.partial respond, user
 
       respond = (user) ->
-        console.log 'BEFORE SET:'
+        console.log '02 BEFORE SET:'
         console.dir request.state
 
         request.auth.session.set _.extend request.state, { user: user.name, auth }
