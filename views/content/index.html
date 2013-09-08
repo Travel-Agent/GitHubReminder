@@ -66,7 +66,7 @@
   </p>
   {{/if}}
 
-  <form class="clearfix" method="POST" action="/settings">
+  <form method="POST" action="/settings">
     <label for="select-email">Email address</label>
     <select name="email" id="select-email" data-visibility-control="#input-email,#input-email-label" data-visibility-option="other">
       {{#email}}
@@ -90,15 +90,15 @@
     <!-- TODO: Offer setting reminder day -->
 
     <div class="control">
-      <input class="inline-control control-part checkbox" type="checkbox" name="immediate" id="input-checkbox" value="true"/>
-      <label class="control-part" for="input-immediate">Send a reminder immediately?</label>
+      <input class="inline control-part checkbox" type="checkbox" name="immediate" id="input-checkbox" value="true"/>
+      <label class="inline control-part" for="input-immediate">Send a reminder immediately?</label>
     </div>
 
-    <input class="inline-control submit" type="submit" value="Save"/>
+    <input class="inline right submit action ok" type="submit" value="Save"/>
   </form>
 
   {{#if isSubscribed}}
-  <a class="cancel" href="/cancel">Cancel reminders</a>
+  <a class="right delete action cancel" href="{{unsubscribeLink}}">Delete my data</a>
   {{/if}}
 </section>
 {{/partial}}

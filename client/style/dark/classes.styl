@@ -7,19 +7,40 @@
 .padded
   padding 0 1em
 
-.action-area
-  margin-top 2em
+.clearfix
+  zoom 1
+  &:before, &:after
+    content '.'
+    display block
+    height 0
+    overflow hidden
+  &:after
+    clear both
+
+.body
+  @extend .clearfix
+
+.footer
+  margin-top -0.8em
+  padding-bottom 0.4em
 
 .action
+  margin 2em 0 0
   padding 0.8em 1.2em
   border-radius 5px
   font-size font-copy
   font-weight bold
-  vertical-gradient(lighten(bg-action, 20%), darken(bg-action, 20%), bg-action)
   color fg-button
   text-shadow 0 -1px 1px shadow-light
   text-decoration none
-  box-shadow 0 1px 1px darken(bg-action, 30%)
+
+  &.ok
+    vertical-gradient(lighten(bg-action, 20%), darken(bg-action, 20%), bg-action)
+    box-shadow 0 1px 1px darken(bg-action, 30%)
+
+  &.cancel
+    vertical-gradient(lighten(bg-cancel, 20%), darken(bg-cancel, 20%), bg-cancel)
+    box-shadow 0 1px 1px darken(bg-cancel, 30%)
 
   &:active
     clear-vertical-gradient()
@@ -27,9 +48,6 @@
 .smallprint
   margin-top 3em
   font-size font-small
-
-.footer
-  margin-top -0.8em
 
 .error
   padding 1em 0
@@ -70,13 +88,16 @@
 .news
   margin-bottom 0.5em
 
+.inline
+  display inline
+
+.right
+  float right
+
 .control
   margin-top 0.6em
 
 .control-part
-  display inline
-
-.inline-control
   width auto
   padding 0
   border none
@@ -87,20 +108,8 @@
   color bg-body
 
 .submit
-  float right
-  border-bottom 2px dotted fg-body
-  background-color bg-body
-  color fg-body
-  font-family 'uni 05_53'
-  font-size font-base
+  width auto
 
-.clearfix
-  zoom 1
-  &:before, &:after
-    content '.'
-    display block
-    height 0
-    overflow hidden
-  &:after
-    clear both
+.delete
+  margin-right 1em
 
