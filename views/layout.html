@@ -6,23 +6,31 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="HandheldFriendly" content="True"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <meta name="description" content="An email reminder service for your GitHub starred repos."/>
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
-    <link rel="stylesheet" href="/GitHubReminder.css"/>
+    <link rel="stylesheet" href="/style/dark.css"/>
   </head>
 
   <body>
-    <h1><a href="/">GitHubReminder</a></h1>
+    <header>
+      <div class="header padded">
+        <h1>{{#block 'startHeading'}}{{/block}}GitHubReminder{{#block 'endHeading'}}{{/block}}</h1>
+      </div>
+    </header>
 
-    {{#block 'content'}}{{/block}}
+    <div class="body padded">
+      {{#block 'content'}}{{/block}}
+    </div>
 
     <footer>
-      <p class="smallprint">
-        Copyright &copy; 2013
-        <a href="https://github.com/philbooth">Phil Booth</a>
-      </p>
+      <div class="footer padded">
+        <p class="smallprint">
+          Copyright &copy; 2013
+          <a href="https://github.com/philbooth">Phil Booth</a>
+        </p>
+      </div>
     </footer>
 
     <script>

@@ -1,0 +1,118 @@
+.header
+  border-bottom 1px solid #999
+
+.undecorated
+  text-decoration none
+
+.padded
+  padding 0 1em
+
+.clearfix
+  zoom 1
+  &:before, &:after
+    content '.'
+    display block
+    height 0
+    overflow hidden
+  &:after
+    clear both
+
+.body
+  @extend .clearfix
+
+.footer
+  margin-top -0.8em
+  padding-bottom 0.4em
+
+.action-area
+  margin-top 2em
+
+.action
+  margin 2em 0 0
+  padding 0.8em 1.2em
+  border-radius 5px
+  font-size font-copy
+  font-weight bold
+  color fg-button
+  text-shadow 0 -1px 1px shadow-light
+  text-decoration none
+
+  &.ok
+    vertical-gradient(lighten(bg-action, 20%), darken(bg-action, 20%), bg-action)
+    box-shadow 0 1px 1px darken(bg-action, 30%)
+
+  &.cancel
+    vertical-gradient(lighten(bg-cancel, 20%), darken(bg-cancel, 20%), bg-cancel)
+    box-shadow 0 1px 1px darken(bg-cancel, 30%)
+
+  &:active
+    clear-vertical-gradient()
+
+.smallprint
+  margin-top 3em
+  font-size font-small
+
+.error
+  padding 1em 0
+  border-radius 5px
+  overflow hidden
+  background-color bg-error
+  color fg-error
+
+  &::selection
+    background-color bg-error-selection
+
+.avatar
+  float left
+  height 32px
+  margin-top 0.5em
+  border 2px solid fg-body
+
+.username
+  margin 0.8em 0 1.5em 42px
+
+.repo
+  display block
+  margin-top 0.3em
+  padding 8px
+  border none
+
+.repo:hover,
+.repo:active
+  background-color fg-body
+  color bg-body
+
+.description
+  margin 0
+
+.signout
+  margin-top 0.3em
+
+.news
+  margin-bottom 0.5em
+
+.inline
+  display inline
+
+.right
+  float right
+
+.control
+  margin-top 0.6em
+
+.control-part
+  width auto
+  padding 0
+  border none
+
+.checkbox
+  vertical-align top
+  background-color fg-body
+  color bg-body
+
+.submit
+  width auto
+
+.delete
+  margin-right 1em
+

@@ -1,7 +1,9 @@
 {{#partial 'title'}}Settings{{/partial}}
+{{#partial 'startHeading'}}{{/partial}}
+{{#partial 'endHeading'}}{{/partial}}
 {{#partial 'content'}}
 <section>
-  <h2>Your account</h2>
+  <h2>Your GitHub account</h2>
 
   <img src="{{avatar}}" class="avatar" alt=""/>
 
@@ -13,21 +15,22 @@
     {{#each repos}}
     <li>
       <a class="repo" href="{{html_url}}" target="_blank">
-        <h4>{{full_name}}</h4>:
+        <h4>{{full_name}}</h4>
+
         <p class="description">{{description}}</p>
 
         <ul>
-          <li>
+          <li class="stat">
             <h5>Language</h5>:
             {{language}}
           </li>
 
-          <li>
+          <li class="stat">
             <h5>Stars</h5>:
             {{watchers_count}}
           </li>
 
-          <li>
+          <li class="stat">
             <h5>Forks</h5>:
             {{forks_count}}
           </li>
@@ -63,7 +66,7 @@
   </p>
   {{/if}}
 
-  <form class="clearfix" method="POST" action="/settings">
+  <form method="POST" action="/settings">
     <label for="select-email">Email address</label>
     <select name="email" id="select-email" data-visibility-control="#input-email,#input-email-label" data-visibility-option="other">
       {{#email}}
@@ -87,15 +90,15 @@
     <!-- TODO: Offer setting reminder day -->
 
     <div class="control">
-      <input class="inline-control control-part checkbox" type="checkbox" name="immediate" id="input-checkbox" value="true"/>
-      <label class="control-part" for="input-immediate">Send a reminder immediately?</label>
+      <input class="inline control-part checkbox" type="checkbox" name="immediate" id="input-checkbox" value="true"/>
+      <label class="inline control-part" for="input-immediate">Send a reminder immediately?</label>
     </div>
 
-    <input class="inline-control submit" type="submit" value="Save"/>
+    <input class="inline right submit action ok" type="submit" value="Save"/>
   </form>
 
   {{#if isSubscribed}}
-  <a class="cancel" href="/cancel">Cancel reminders</a>
+  <a class="right delete action cancel" href="{{unsubscribeLink}}">Delete my data</a>
   {{/if}}
 </section>
 {{/partial}}

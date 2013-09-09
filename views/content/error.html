@@ -1,4 +1,6 @@
 {{#partial 'title'}}Error{{/partial}}
+{{#partial 'startHeading'}}<a class="undecorated" href="/">{{/partial}}
+{{#partial 'endHeading'}}</a>{{/partial}}
 {{#partial 'content'}}
 <section>
   <h2>Crikey</h2>
@@ -21,16 +23,16 @@
     into the description too:
   </p>
 
-  <ul class="details">
-    <li>Action: {{action}}</li>
-    <li>{{message}}</li>
-    <li>Route: {{route}}</li>
-    <li>Host: {{host}}</li>
-    <li>Method: {{method}}</li>
-    <li>Path: {{path}}</li>
-    <li>User: {{user}}</li>
-    <li>Referrer: {{referrer}}</li>
-  </ul>
+  <pre class="error">
+    Action: {{action}}
+    {{message}}
+    Route: {{route}}
+    Host: {{host}}
+    Method: {{method}}
+    Path: {{path}}
+    Query: {{query}}
+    User: {{user}}
+    Referrer: {{referrer}}</pre>
 
   <p>
     Thanks and sorry.

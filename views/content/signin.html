@@ -1,4 +1,6 @@
 {{#partial 'title'}}Sign in{{/partial}}
+{{#partial 'startHeading'}}{{/partial}}
+{{#partial 'endHeading'}}{{/partial}}
 {{#partial 'content'}}
 <p>
   Do you have hundreds or even thousands
@@ -9,26 +11,29 @@
 </p>
 
 <p>
-  If you sign in with your GitHub account below,
-  I'll send you a regular reminder
+  Sign in with your GitHub account
+  and I'll send you regular reminders
   about those forgotten repos,
   picking one at random
   and emailing you its details
   every day, week or month
-  according to your preference.
+  according to your preference.<sup>*</sup>
 </p>
 
-<p>
-  I promise not to do anything else with your data
-  and you can unsubscribe from the reminders
-  and delete all your data from my database
-  with one click.
-  You can also see the source code for this website
-  <a href="https://github.com/philbooth/GitHubReminder">on GitHub</a>.
-</p>
+<div class="action-area">
+  <a class="action ok" href="{{url}}">Sign in with GitHub</a>
+</div>
 
-<p class="action">
-  <a href="{{url}}">Sign in with GitHub</a>
-</p>
+<aside>
+  <p class="smallprint">
+    <sup>*</sup>I promise never
+    to do anything else with your data
+    and you can unsubscribe from the reminders
+    and delete all of your data from my database
+    with one click.
+    You can also see the source code for this website
+    <a href="https://github.com/philbooth/GitHubReminder">on GitHub</a>.
+  </p>
+</aside>
 {{/partial}}
 {{> layout}}
