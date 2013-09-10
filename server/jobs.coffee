@@ -29,21 +29,27 @@ runDueJobs = ->
         $lte: Date.now()
       verify:
         $exists: false
-  }, (error, users) ->
+  }, (error, cursor) ->
     if error
-      log.error "failed to get due jobs, reason `#{error}`"
-    else
+      return log.error "failed to get due jobs, reason `#{error}`"
+
+    cursor.toArray (error, users) ->
+      if error
+        return log.error "failed to convert due jobs to array, reason `#{error}`"
+
       log.info "got #{users.length} due jobs"
+
       users.forEach (user, index) ->
         log.info "running due job ##{index}:"
         console.dir user
+
         runJob null, user, (error) ->
           if error
             return log.error "failed due job ##{index}, reason `#{error}`"
 
           log.info "completed due job ##{index}"
 
-    setTimeout runDueJobs, hourly
+  setTimeout runDueJobs, hourly
 
 runJob = (error, user, after) ->
   repos = undefined
