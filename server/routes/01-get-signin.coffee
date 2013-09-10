@@ -12,17 +12,7 @@ module.exports =
       mode: 'try'
     handler: (request) ->
       receiveToken = (token) ->
-        console.log '01 BEFORE SET:'
-        console.dir request.state
-
-        # TODO: INVESTIGATE WHY THIS CALL APPEARS TO CAUSE THE SERVER TO CRASH WITH 'Error: socket hang up' MESSAGE
-        request.auth.session.set _.extend request.state, { token }
-        setTimeout _.partial(respond, token), 0
-
-      respond = (token) ->
-        console.log '01 AFTER SET:'
-        console.dir request.state
-
+        request.auth.session.set { token }
         request.reply.view 'content/signin.html',
           url: "#{config.uri}?client_id=#{encodeURIComponent config.id}&scope=#{encodeURIComponent config.scope}&state=#{encodeURIComponent token}"
 

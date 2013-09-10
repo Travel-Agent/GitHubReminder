@@ -44,12 +44,8 @@ module.exports =
           errorHelper.failOrContinue request, error, 'store user', _.partial respond, user
 
       respond = (user) ->
-        console.log '02 BEFORE SET:'
-        console.dir request.state
-
-        request.auth.session.set _.extend request.state, { user: user.name, auth }
-
-        setTimeout _.bind(request.reply.redirect, request.reply, '/'), 0
+        request.auth.session.set { user: user.name, auth }
+        request.reply.redirect '/'
 
       if request.query.error
         return errorHelper.fail request, 'OAuth', "Error: #{request.query.error}"
