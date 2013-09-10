@@ -19,8 +19,8 @@
       "compile-stylus-dark": "./node_modules/.bin/stylus -o public/style client/style/dark/index.styl && mv public/style/index.css public/style/dark.css",
       "compile-stylus": "npm run compile-stylus-dark",
 
-      "prefix-css-console": "./node_modules/.bin/autoprefixer -b 'last 5 versions, > 1%' public/style/console.css",
-      "prefix-css-dark": "./node_modules/.bin/autoprefixer -b 'last 5 versions, > 1%' public/style/dark.css",
+      "prefix-css-console": "./node_modules/.bin/autoprefixer -b 'last 5 versions, > 1%, ie >= 7, ff >= 15' public/style/console.css",
+      "prefix-css-dark": "./node_modules/.bin/autoprefixer -b 'last 5 versions, > 1%, ie >= 7, ff >= 15' public/style/dark.css",
       "prefix-css": "npm run prefix-css-dark",
 
       "compress-css-console": "./node_modules/.bin/cleancss -e -o public/style/console.css public/style/console.css",
