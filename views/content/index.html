@@ -3,47 +3,49 @@
 {{#partial 'endHeading'}}{{/partial}}
 {{#partial 'content'}}
 <section>
-  <h2>Your GitHub account</h2>
+  <div class="panel rounded">
+    <h2 class="panel-header rounded-top">Your GitHub account</h2>
 
-  <img src="{{avatar}}" class="avatar" alt=""/>
+    <img src="{{avatar}}" class="avatar" alt=""/>
 
-  <p class="username">{{user}}</p>
+    <p class="username">{{user}}</p>
 
-  <h3>Recently starred repositories</h3>
+    <h3>Recently starred repositories:</h3>
 
-  <ul>
-    {{#each repos}}
-    <li>
-      <a class="repo" href="{{html_url}}" target="_blank">
-        <h4>{{full_name}}</h4>
+    <ul>
+      {{#each repos}}
+      <li class="repo">
+        <h4>
+          <a href="{{html_url}}" target="_blank">{{full_name}}</a>
+        </h4>
 
         <p class="description">{{description}}</p>
 
         <ul>
           <li class="stat">
-            <h5>Language</h5>:
-            {{language}}
+            <h5>Language:</h5>
+            <span class="copy">{{language}}</span>
           </li>
 
           <li class="stat">
-            <h5>Stars</h5>:
-            {{watchers_count}}
+            <h5>Stars:</h5>
+            <span class="copy">{{watchers_count}}</span>
           </li>
 
           <li class="stat">
-            <h5>Forks</h5>:
-            {{forks_count}}
+            <h5>Forks:</h5>
+            <span class="copy">{{forks_count}}</span>
           </li>
         </ul>
-      </a>
-    </li>
-    {{/each}}
-  </ul>
+      </li>
+      {{/each}}
+    </ul>
 
-  <p class="signout">
-    Wrong account?
-    <a href="/signout">Sign out</a>.
-  </p>
+    <p class="signout">
+      Wrong account?
+      <a href="/signout">Sign out</a>.
+    </p>
+  </div>
 </section>
 
 <section>
@@ -94,11 +96,11 @@
       <label class="inline control-part" for="input-immediate">Send a reminder immediately?</label>
     </div>
 
-    <input class="inline right submit action ok" type="submit" value="Save"/>
+    <input class="inline right submit action ok rounded" type="submit" value="Save"/>
   </form>
 
   {{#if isSubscribed}}
-  <a class="right delete action cancel" href="{{unsubscribeLink}}">Delete my data</a>
+  <a class="right delete action cancel rounded" href="{{unsubscribeLink}}">Delete my data</a>
   {{/if}}
 </section>
 {{/partial}}
