@@ -4,6 +4,7 @@ check = require 'check-types'
 events = require '../events'
 eventBroker = require '../eventBroker'
 userHelper = require './helpers/user'
+tokenHelper = require './helpers/token'
 errorHelper = require './helpers/error'
 httpErrorHelper = require './helpers/httpError'
 
@@ -25,11 +26,24 @@ module.exports =
         userHelper.fetch request.state.sid.user, receiveUser
 
       receiveUser = (error, user) ->
+        storeUser = ->
+          currentUser = user
+          after()
+
+        updateUser = (unsubscribe) ->
+          userHelper.update request.state.sid.user, { unsubscribe }, {}, (error) ->
+            errorHelper.failOrContinue request, error, 'update user', ->
+              user.unsubscribe = unsubscribe
+              storeUser()
+
         errorHelper.failOrContinue request, error, 'fetch user', ->
           if user is null
             return handleDeletedUser()
-          currentUser = user
-          after()
+
+          if user.unsubscribe
+            return storeUser()
+
+          tokenHelper.generate updateUser
         , onError
 
       handleDeletedUser = ->

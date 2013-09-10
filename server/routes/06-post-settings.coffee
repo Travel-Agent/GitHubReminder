@@ -6,6 +6,7 @@ events = require '../events'
 eventBroker = require '../eventBroker'
 userHelper = require './helpers/user'
 errorHelper = require './helpers/error'
+tokenHelper = require './helpers/token'
 
 day = 24 * 60 * 60 * 1000
 
@@ -31,9 +32,10 @@ module.exports =
           if request.payload.otherEmail is ''
             return request.reply.redirect '/?saved=no&reason=a%20valid%20email%20address%20was%20not%20provided'
           emailAddress = request.payload.otherEmail
-          eventBroker.publish events.tokens.generate, null, (t) ->
+          tokenHelper.generate (t) ->
             token = t
-            updateUser { verify: token, verifyExpire: Date.now() + day, verifyEmail: emailAddress }, verifyOtherEmail
+            updateUser { verify: token, verifyExpire: Date.now() + day, verifyEmail: emailAddress }, (error) ->
+              errorHelper.failOrContinue request, error, 'update user', verifyOtherEmail
         else
           emailAddress = request.payload.email
           generateJob()
