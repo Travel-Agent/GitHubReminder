@@ -37,13 +37,12 @@ rounding = 5px
   margin-top -0.8em
   padding-bottom 0.4em
 
-.body
-  @extend .clearfix
-
 .action-area
   margin-top 2em
 
 .action
+  @extend .rounded
+
   margin 2em 0 0
   padding 0.8em 1.2em
   font-size font-copy
@@ -64,6 +63,8 @@ rounding = 5px
     clear-vertical-gradient()
 
 .error
+  @extend .rounded
+
   padding 1em 0
   overflow hidden
   background-color bg-error
@@ -76,11 +77,19 @@ panel-padding = 0.8em
 panel-padding-undo = 0 - panel-padding
 
 .panel
+  @extend .rounded
+  @extend .clearfix
+
   margin-top 1em
   padding panel-padding
   border 1px solid fg-border
 
+  .action
+    margin-top 1em
+
 .panel-header
+  @extend .rounded-top
+
   margin panel-padding-undo panel-padding-undo panel-padding
   padding panel-padding panel-padding 0.6em
   border-bottom 1px solid fg-border
@@ -129,6 +138,7 @@ panel-padding-undo = 0 - panel-padding
 
 .submit
   width auto
+  line-height normal
 
 .delete
   margin-right 1em

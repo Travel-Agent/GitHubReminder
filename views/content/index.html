@@ -3,8 +3,8 @@
 {{#partial 'endHeading'}}{{/partial}}
 {{#partial 'content'}}
 <section>
-  <div class="panel rounded">
-    <h2 class="panel-header rounded-top">Your GitHub account</h2>
+  <div class="panel">
+    <h2 class="panel-header">Your GitHub account</h2>
 
     <img src="{{avatar}}" class="avatar" alt=""/>
 
@@ -49,59 +49,61 @@
 </section>
 
 <section>
-  <h2>Reminder settings</h2>
+  <div class="panel">
+    <h2 class="panel-header">Reminder settings</h2>
 
-  {{#if isSaved}}
-  <p class="news good">Your settings have been saved.</p>
-  {{/if}}
-  {{#if isFailed}}
-  <p class="news bad">Your settings have not been saved because {{reason}}.</p>
-  {{/if}}
-  {{#if isAwaitingVerification}}
-  <p class="news indifferent">
-    Your email address must be verified
-    before your settings are made active.
-    An email has been sent
-    to {{verificationEmail}};
-    if you click on the link in that email,
-    your reminders will be activated.
-  </p>
-  {{/if}}
+    {{#if isSaved}}
+    <p class="news good">Your settings have been saved.</p>
+    {{/if}}
+    {{#if isFailed}}
+    <p class="news bad">Your settings have not been saved because {{reason}}.</p>
+    {{/if}}
+    {{#if isAwaitingVerification}}
+    <p class="news indifferent">
+      Your email address must be verified
+      before your settings are made active.
+      An email has been sent
+      to {{verificationEmail}};
+      if you click on the link in that email,
+      your reminders will be activated.
+    </p>
+    {{/if}}
 
-  <form method="POST" action="/settings">
-    <label for="select-email">Email address</label>
-    <select name="email" id="select-email" data-visibility-control="#input-email,#input-email-label" data-visibility-option="other">
-      {{#email}}
-      <option value="{{address}}"{{#if isSelected}} selected="selected"{{/if}}>{{address}}</option>
-      {{/email}}
-      <option value="other"{{#if isOtherEmail}} selected="selected"{{/if}}>Other</option>
-    </select>
+    <form method="POST" action="/settings">
+      <label for="select-email">Email address:</label>
+      <select name="email" id="select-email" data-visibility-control="#input-email,#input-email-label" data-visibility-option="other">
+        {{#email}}
+        <option value="{{address}}"{{#if isSelected}} selected="selected"{{/if}}>{{address}}</option>
+        {{/email}}
+        <option value="other"{{#if isOtherEmail}} selected="selected"{{/if}}>Other</option>
+      </select>
 
-    <label for="input-email" id="input-email-label">Other email address</label>
-    <input type="text" name="otherEmail" id="input-email" value="{{otherEmail}}"/>
+      <label for="input-email" id="input-email-label">Other email address:</label>
+      <input type="text" name="otherEmail" id="input-email" value="{{otherEmail}}"/>
 
-    <label for="select-frequency">Frequency</label>
-    <select name="frequency" id="select-frequency">
-      <!-- TODO: Handlebars helper to DRY this out -->
-      <option value="daily"{{#if isDaily}} selected="selected"{{/if}}>Daily</option>
-      <option value="weekly"{{#if isWeekly}} selected="selected"{{/if}}>Weekly</option>
-      <option value="monthly"{{#if isMonthly}} selected="selected"{{/if}}>Monthly</option>
-    </select>
+      <label for="select-frequency">Frequency:</label>
+      <select name="frequency" id="select-frequency">
+        <!-- TODO: Handlebars helper to DRY this out -->
+        <option value="daily"{{#if isDaily}} selected="selected"{{/if}}>Daily</option>
+        <option value="weekly"{{#if isWeekly}} selected="selected"{{/if}}>Weekly</option>
+        <option value="monthly"{{#if isMonthly}} selected="selected"{{/if}}>Monthly</option>
+      </select>
 
-    <!-- TODO: Offer setting reminder time (in user's time zone) -->
-    <!-- TODO: Offer setting reminder day -->
+      <!-- TODO: Offer setting reminder time (in user's time zone) -->
+      <!-- TODO: Offer setting reminder day -->
 
-    <div class="control">
-      <input class="inline control-part checkbox" type="checkbox" name="immediate" id="input-checkbox" value="true"/>
-      <label class="inline control-part" for="input-immediate">Send a reminder immediately?</label>
-    </div>
+      <div class="control">
+        <input class="inline control-part checkbox" type="checkbox" name="immediate" id="input-checkbox" value="true"/>
+        <label class="inline control-part" for="input-immediate">Send a reminder immediately?</label>
+      </div>
 
-    <input class="inline right submit action ok rounded" type="submit" value="Save"/>
-  </form>
+      <input class="inline right submit action ok" type="submit" value="Save"/>
+    </form>
 
-  {{#if isSubscribed}}
-  <a class="right delete action cancel rounded" href="{{unsubscribeLink}}">Delete my data</a>
-  {{/if}}
+    {{#if isSubscribed}}
+    <a class="right delete action cancel" href="{{unsubscribeLink}}">Delete my data</a>
+    {{/if}}
+  </div>
 </section>
 {{/partial}}
 {{> layout}}
