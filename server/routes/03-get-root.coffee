@@ -94,7 +94,7 @@ module.exports =
           isAwaitingVerification
           verificationEmail: currentUser.verifyEmail
           isSubscribed: currentUser.isSaved and !isAwaitingVerification
-          unsubscribeLink: "/unsubscribe?user=#{currentUser.name}&token=#{currentUser.unsubscribe}"
+          unsubscribeLink: "/unsubscribe?user=#{currentUser.name}&token=#{currentUser.unsubscribe}&clobber=yes"
         }
 
       begin()
