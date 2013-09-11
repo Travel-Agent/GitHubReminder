@@ -63,11 +63,19 @@ module.exports =
           errorHelper.failOrContinue request, error, 'update user', _.partial finish, true
 
       updateUser = (fields, after) ->
+        if fields.job
+          unset =
+            verify: null
+            verifyExpire: null
+            verifyEmail: null
+        else
+          unset = {}
+
         userHelper.update request.state.sid.user, _.defaults(fields,
           email: emailAddress
           frequency: request.payload.frequency
           isSaved: true
-        ), {}, after
+        ), unset, after
 
       verifyEmail()
 
