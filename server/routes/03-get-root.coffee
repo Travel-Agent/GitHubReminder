@@ -6,6 +6,7 @@ eventBroker = require '../eventBroker'
 userHelper = require './helpers/user'
 errorHelper = require './helpers/error'
 httpErrorHelper = require './helpers/httpError'
+log = require('../log').initialise 'routes/03'
 
 module.exports =
   path: '/'
@@ -17,9 +18,22 @@ module.exports =
       outstandingRequests = 3
 
       begin = ->
+        unless stateIsSane()
+          log.error 'insane state detected'
+          return signout()
+
         getUser()
         getEmails()
         getRecentStars()
+
+      stateIsSane = ->
+        check.isObject request.state.sid and
+          check.isUnemptyString request.state.sid.user and
+          check.isUnemptyString request.state.sid.auth
+
+      signout = ->
+        log.info 'signing out'
+        request.reply.redirect '/signout'
 
       getUser = ->
         userHelper.fetch request.state.sid.user, receiveUser
@@ -33,8 +47,9 @@ module.exports =
         , onError
 
       handleDeletedUser = ->
+        log.warning 'user deleted'
         onError()
-        request.reply.redirect '/signout'
+        signout()
 
       onError = ->
         outstandingRequests = -1
@@ -96,6 +111,12 @@ module.exports =
           isSubscribed: currentUser.isSaved and !isAwaitingVerification
           unsubscribeLink: "/unsubscribe?user=#{currentUser.name}&token=#{currentUser.unsubscribe}&clobber=yes"
         }
+
+      log.info 'handling request'
+      log.info 'query:'
+      console.dir request.query
+      log.info 'state:'
+      console.dir request.state
 
       begin()
 

@@ -9,6 +9,7 @@ userHelper = require './helpers/user'
 errorHelper = require './helpers/error'
 httpErrorHelper = require './helpers/httpError'
 config = require('../../config').oauth
+log = require('../log').initialise 'routes/02'
 
 module.exports =
   path: config.route
@@ -20,9 +21,11 @@ module.exports =
       auth = undefined
 
       getToken = ->
+        log.info "exchanging auth code #{request.query.code} for access token"
         eventBroker.publish events.github.getToken, request.query.code, (response) ->
           httpErrorHelper.failOrContinue request, response, (body) ->
             auth = body.access_token
+            log.info "received access token #{auth}"
             getGhUser()
 
       getGhUser = ->
@@ -47,10 +50,18 @@ module.exports =
         request.auth.session.set { user: user.name, auth }
         request.reply.redirect '/'
 
+      log.info 'handling request:'
+      log.info 'query:'
+      console.dir request.query
+      log.info 'state:'
+      console.dir request.state
+
       if request.query.error
+        log.error request.query.error
         return errorHelper.fail request, 'OAuth', "Error: #{request.query.error}"
 
       unless request.query.state is request.state.sid?.token
+        log.error "invalid state #{request.query.state}"
         return errorHelper.fail request, 'OAuth', 'Error: state mismatch'
 
       getToken()
