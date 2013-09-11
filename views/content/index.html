@@ -54,21 +54,22 @@
   <div class="panel">
     <h2 class="panel-header">Reminder settings</h2>
 
-    {{#if isSaved}}
-    <p class="news good">Your settings have been saved.</p>
-    {{/if}}
     {{#if isFailed}}
     <p class="news bad">Your settings have not been saved because {{reason}}.</p>
-    {{/if}}
-    {{#if isAwaitingVerification}}
-    <p class="news indifferent">
-      Your email address must be verified
-      before your settings are made active.
-      An email has been sent
-      to {{verificationEmail}};
-      if you click on the link in that email,
-      your reminders will be activated.
-    </p>
+    {{else}}
+      {{#if isSaved}}
+      <p class="news good">Your settings have been saved.</p>
+      {{/if}}
+      {{#if isAwaitingVerification}}
+      <p class="news indifferent">
+        Your email address must be verified
+        before your settings are made active.
+        An email has been sent
+        to {{verificationEmail}};
+        if you click on the link in that email,
+        your reminders will be activated.
+      </p>
+      {{/if}}
     {{/if}}
 
     <form method="POST" action="/settings">
