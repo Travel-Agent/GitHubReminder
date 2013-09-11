@@ -28,9 +28,9 @@ module.exports =
         getRecentStars()
 
       stateIsSane = ->
-        check.isObject request.state.sid and
-          check.isUnemptyString request.state.sid.user and
-          check.isUnemptyString request.state.sid.auth
+        check.isObject(request.state.sid) and
+          check.isUnemptyString(request.state.sid.user) and
+          check.isUnemptyString(request.state.sid.auth)
 
       signout = ->
         log.info 'signing out'
