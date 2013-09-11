@@ -30,7 +30,7 @@ module.exports =
       verifyEmail = ->
         if request.payload.email is 'other'
           if request.payload.otherEmail is ''
-            return request.reply.redirect '/?saved=no&reason=a%20valid%20email%20address%20was%20not%20provided'
+            return request.reply.redirect '/?saved=no&reason=a%20valid%20email%20address%20was%20not%20provided#settings'
           emailAddress = request.payload.otherEmail
           tokenHelper.generate (t) ->
             token = t
@@ -46,13 +46,13 @@ module.exports =
           emailAddress
           token
         }, (error) ->
-          next = _.partial finish, false, '/'
+          next = _.partial finish, false
           errorHelper.failOrContinue request, error, 'send verification email', next
 
-      finish = (allowImmediate, redirectPath) ->
+      finish = (allowImmediate) ->
         if allowImmediate and request.payload.immediate is 'true'
           eventBroker.publish events.jobs.force, request.state.sid.user
-        request.reply.redirect redirectPath
+        request.reply.redirect '/#settings'
 
       generateJob = ->
         eventBroker.publish events.jobs.generate, request.payload.frequency, (error, job) ->
@@ -60,7 +60,7 @@ module.exports =
 
       receiveJob = (job) ->
         updateUser { job }, (error) ->
-          errorHelper.failOrContinue request, error, 'update user', _.partial finish, true, '/'
+          errorHelper.failOrContinue request, error, 'update user', _.partial finish, true
 
       updateUser = (fields, after) ->
         userHelper.update request.state.sid.user, _.defaults(fields,
