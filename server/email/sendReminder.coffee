@@ -7,12 +7,13 @@ initialise = (transport, config, subjectPrefix) ->
   log.info 'initialising'
 
   (event) ->
-    { to, frequency, repo, paths } = event.getData()
+    { to, user, frequency, repo, paths } = event.getData()
 
     text = """
-           Hello,
+           Hey #{user},
 
-           This is your #{frequency} GitHub reminder.
+           This is your #{frequency} email from GitHubReminder. Your starred repo
+           of the day is called #{repo.name}.
 
            Repository: #{repo.full_name}
            Description: #{repo.description || ''}

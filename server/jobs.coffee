@@ -85,6 +85,7 @@ runJob = (error, user, after) ->
     unsubscribe = "unsubscribe?user=#{user.name}&token=#{user.unsubscribe}"
     eventBroker.publish events.email.sendReminder, {
       to: user.email
+      user: user.name
       frequency: user.frequency
       repo: selectRandom repos
       paths: {
