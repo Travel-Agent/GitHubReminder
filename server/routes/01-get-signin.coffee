@@ -3,7 +3,7 @@
 _ = require 'underscore'
 tokenHelper = require './helpers/token'
 config = require('../../config').oauth
-log = require('../log').initialise 'routes/03'
+log = require('../log').initialise 'routes/01'
 
 module.exports =
   path: '/signin'
