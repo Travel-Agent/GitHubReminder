@@ -49,7 +49,7 @@ runDueJobs = ->
 
           log.info "completed due job ##{index}"
 
-  setTimeout runDueJobs, hourly
+  setTimeout runDueJobs, hourly / 12
 
 runJob = (error, user, after) ->
   repos = undefined
