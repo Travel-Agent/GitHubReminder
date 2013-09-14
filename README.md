@@ -2,8 +2,8 @@
 
 https://githubreminder.org/
 
-An email reminder service
-for your GitHub starred repos.
+A serendipitous email reminder
+for your starred repos on GitHub.
 
 ## Dependencies
 

@@ -12,8 +12,7 @@ initialise = (transport, config, subjectPrefix) ->
     text = """
            Hey #{user},
 
-           This is your #{frequency} email from GitHubReminder. Your starred repo
-           of the day is called #{repo.name}.
+           This is your #{frequency} email from GitHubReminder. Your starred repo of the day is called #{repo.name}.
 
            Repository: #{repo.full_name}
            Description: #{repo.description || ''}

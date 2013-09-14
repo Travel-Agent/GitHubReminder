@@ -1,3 +1,8 @@
 User-agent: *
-Disallow: /
+Disallow: /oauth
+Disallow: /signout
+Disallow: /cancel
+Disallow: /settings
+Disallow: /verify-email
+Disallow: /unsubscribe
 
