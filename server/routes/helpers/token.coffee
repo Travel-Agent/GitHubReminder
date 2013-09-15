@@ -7,7 +7,7 @@ errorHelper = require './error'
 
 check = (request, tokenType, callback) ->
   getUser = ->
-    eventBroker.publish events.database.fetch, { type: 'users', name: request.query.user }, receiveUser
+    eventBroker.publish events.database.fetch, { type: 'users', query: { name: request.query.user } }, receiveUser
 
   receiveUser = (error, user) ->
     errorHelper.failOrContinue request, error, 'fetch user', _.partial checkToken, user
