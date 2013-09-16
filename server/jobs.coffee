@@ -13,6 +13,8 @@ weekly = daily * 7
 monthly = (weekly * 52) / 12
 frequencies = { daily, weekly, monthly }
 
+jobFrequency = hourly / 60
+
 retryInterval = 1000
 retryLimit = 10
 
@@ -48,11 +50,13 @@ runDueJobs = ->
 
         runJob null, user, (error) ->
           if error
-            return log.error "failed due job ##{index}, reason `#{error}`"
+            log.error "failed due job ##{index}, reason `#{error}`"
+            log.error 'failed job:'
+            console.dir user
 
           log.info "completed due job ##{index}"
 
-  setTimeout runDueJobs, hourly / 12
+  setTimeout runDueJobs, jobFrequency
 
 runJob = (error, user, after) ->
   repos = undefined
