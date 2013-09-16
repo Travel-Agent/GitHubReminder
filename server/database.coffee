@@ -107,15 +107,16 @@ doAsync = (object, methodName, args, after, failOnError, retryCount = 0) ->
 
   argsCloned.push (error, result) ->
     if error
+      log.error "`#{methodName}` returned error `#{error}`"
+
       if retryCount < retryLimit
-        log.error "`#{methodName}` returned error `#{error}`"
         return doAsync object, methodName, args, after, failOnError, retryCount + 1
 
       if failOnError
         log.error 'fatal, exiting'
         process.exit 1
 
-      after error, null
+      return after error, null
 
     log.info "`#{methodName}` returned ok"
 

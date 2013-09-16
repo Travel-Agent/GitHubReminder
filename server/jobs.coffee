@@ -13,6 +13,9 @@ weekly = daily * 7
 monthly = (weekly * 52) / 12
 frequencies = { daily, weekly, monthly }
 
+retryInterval = 1000
+retryLimit = 10
+
 initialise = ->
   log = log.initialise 'jobs'
   log.info 'initialising'
@@ -53,6 +56,7 @@ runDueJobs = ->
 
 runJob = (error, user, after) ->
   repos = undefined
+  retryCount = 0
 
   getStarredRepos = ->
     eventBroker.publish events.github.getStarredAll, user.auth, (response) ->
@@ -93,8 +97,18 @@ runJob = (error, user, after) ->
         unsubscribe
         clobber: "#{unsubscribe}&clobber=yes"
       }
-    }, (error, response) ->
-      failOrContinue error, response, after, generateJob
+    }, (error) ->
+      if error
+        retryCount += 1
+        log.error "failed to send email (attempt #{retryCount}), reason `#{error}`"
+
+        if retryCount < retryLimit
+          log.info "retrying in #{retryInterval} milliseconds"
+          return setTimeout sendReminder, retryInterval
+
+        return after error
+
+      generateJob()
 
   generateJob = ->
     eventBroker.publish events.jobs.generate, user.frequency, (error, job) ->
