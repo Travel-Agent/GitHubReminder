@@ -1,11 +1,12 @@
 'use strict'
 
+_ = require 'underscore'
 mongo = require 'mongodb'
 eventBroker = require './eventBroker'
 log = require './log'
 config = require('../config').database
 
-retryInterval = 500
+retryInterval = 1000
 retryLimit = 10
 collections = [ 'users' ]
 indices =
@@ -85,8 +86,9 @@ connected = (connection, authenticate = true) ->
         log.error "no connection for #{action} (attempt #{retryCount})"
 
         if retryCount < retryLimit
-          return setTimeout _.partial(handler, action, getArgs), retryInterval
+          return setTimeout _.partial(handler, event), retryInterval
 
+        retryCount = 0
         return event.respond 'no database connection'
 
       data = event.getData()
