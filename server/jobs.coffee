@@ -104,7 +104,7 @@ runJob = (error, user, after) ->
     }, (error) ->
       if error
         retryCount += 1
-        log.error "failed to send email (attempt #{retryCount}), reason `#{error}`"
+        log.error "failed to send email (attempt ##{retryCount}), reason `#{error}`"
 
         if retryCount < retryLimit
           log.info "retrying in #{retryInterval} milliseconds"
