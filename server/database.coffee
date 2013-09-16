@@ -5,7 +5,8 @@ eventBroker = require './eventBroker'
 log = require './log'
 config = require('../config').database
 
-retryLimit = 3
+retryInterval = 500
+retryLimit = 10
 collections = [ 'users' ]
 indices =
   users: [ { spec: { name: 1 }, isUnique: 1 }, { spec: { job: 1 } }, { spec: { verifyExpire: 1 } } ]
@@ -20,6 +21,8 @@ connect = (database) ->
   doAsync database, 'open', [], connected, true
 
 connected = (connection, authenticate = true) ->
+  isConnected = true
+
   authenticationHandler = (result) ->
     if result is false
       log.error 'failed to authenticate database credentials'
@@ -65,14 +68,27 @@ connected = (connection, authenticate = true) ->
   bindEvents = ->
     eventBroker.subscribe 'database', eventHandlers
 
-    # TODO: Do I need to maintain state here and check for an open connection before running queries?
     connection.on 'close', ->
-      log.info 'connection closed'
+      isConnected = false
+      log.warning 'connection closed'
+
     connection.on 'open', ->
+      isConnected = true
       log.info 'connection opened'
 
   createEventHandler = (action, getArgs) ->
-    (event) ->
+    retryCount = 0
+    handler = (event) ->
+      if isConnected is false
+        retryCount += 1
+
+        log.error "no connection for #{action} (attempt #{retryCount})"
+
+        if retryCount < retryLimit
+          return setTimeout _.partial(handler, action, getArgs), retryInterval
+
+        return event.respond 'no database connection'
+
       data = event.getData()
       doAsync collections[data.type], action, getArgs(data), event.respond, false
 
