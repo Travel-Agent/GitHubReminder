@@ -102,6 +102,7 @@ runJob = (error, user, after) ->
         clobber: "#{unsubscribe}&clobber=yes"
       }
     }, (error) ->
+      # TODO: Use retrier
       if error
         retryCount += 1
         log.error "failed to send email (attempt ##{retryCount}), reason `#{error}`"

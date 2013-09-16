@@ -2,12 +2,11 @@
 
 _ = require 'underscore'
 mongo = require 'mongodb'
+events = require './events'
 eventBroker = require './eventBroker'
 log = require './log'
 config = require('../config').database
 
-retryInterval = 1000
-retryLimit = 10
 collections = [ 'users' ]
 indices =
   users: [ { spec: { name: 1 }, isUnique: 1 }, { spec: { job: 1 } }, { spec: { verifyExpire: 1 } } ]
@@ -78,21 +77,22 @@ connected = (connection, authenticate = true) ->
       log.info 'connection opened'
 
   createEventHandler = (action, getArgs) ->
-    retryCount = 0
-    handler = (event) ->
-      if isConnected is false
-        retryCount += 1
-
-        log.error "no connection for #{action} (attempt #{retryCount})"
-
-        if retryCount < retryLimit
-          return setTimeout _.partial(handler, event), retryInterval
-
-        retryCount = 0
-        return event.respond 'no database connection'
-
+    (event) ->
       data = event.getData()
-      doAsync collections[data.type], action, getArgs(data), event.respond, false
+
+      log.info "event handler for #{action}:"
+      console.dir data
+
+      eventBroker.publish events.retrier.try, {
+        name: "database #{action}"
+        predicate: ->
+          if isConnected is false
+            log.error "no connection for #{action}"
+          isConnected
+        fail: ->
+          event.respond 'no database connection'
+      }, ->
+        doAsync collections[data.type], action, getArgs(data), event.respond, false
 
   eventHandlers =
     fetch: createEventHandler 'findOne', (data) ->
@@ -124,10 +124,11 @@ doAsync = (object, methodName, args, after, failOnError, retryCount = 0) ->
   argsCloned = args.slice 0
 
   argsCloned.push (error, result) ->
+    # TODO: Use retrier
     if error
       log.error "`#{methodName}` returned error `#{error}`"
 
-      if retryCount < retryLimit
+      if retryCount < 3
         return doAsync object, methodName, args, after, failOnError, retryCount + 1
 
       if failOnError

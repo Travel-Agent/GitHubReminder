@@ -6,7 +6,7 @@ log = require './log'
 log = log.initialise 'server'
 
 log.info 'loading server modules'
-modules = [ 'database', 'templates', 'github', 'email', 'tokens', 'errors', 'jobs' ]
+modules = [ 'database', 'retrier', 'templates', 'github', 'email', 'tokens', 'errors', 'jobs' ]
 modules.forEach (m) ->
   require("./#{m}").initialise()
 

@@ -7,6 +7,7 @@ prefixes =
   email: 'em'
   tokens: 'tk'
   errors: 'er'
+  retrier: 'rt'
 
 events =
   github: [ 'get-token', 'get-user', 'get-email', 'get-starred-recent', 'get-starred-all' ]
@@ -15,6 +16,7 @@ events =
   email: [ 'send-reminder', 'send-error', 'send-verification' ]
   tokens: [ 'generate' ]
   errors: [ 'report' ]
+  retrier: [ 'try' ]
 
 getEventMap = ->
   result = {}
