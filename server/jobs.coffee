@@ -13,7 +13,7 @@ weekly = daily * 7
 monthly = (weekly * 52) / 12
 frequencies = { daily, weekly, monthly }
 
-jobFrequency = hourly
+jobFrequency = hourly / 30
 
 retryInterval = 1000
 retryLimit = 10
