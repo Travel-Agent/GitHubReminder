@@ -65,17 +65,11 @@ request = (what, options, data, callback) ->
       body += response.read()
 
     response.on 'end', ->
-      body = JSON.parse body
-
-      log.info "response body for #{response.statusCode} from `#{options.path}`:"
-      console.dir body
-
-      callback {
+      callback
         status: response.statusCode
         origin: "#{response.req.method} #{response.req.path}"
         headers: response.headers
-        body
-      }
+        body: JSON.parse body
 
   if data
     log.info "writing data `#{data}` to `#{options.path}`"
