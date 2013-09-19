@@ -66,11 +66,13 @@ runJob = (error, user, after) ->
 
   getStarredRepos = ->
     eventBroker.publish events.github.getStarredAll, user.auth, (response) ->
-      if response.status is 403 and response.body.message is 'Bad credentials'
+      if response.status is 401 or response.status is 403
         clearJob()
       httpFailOrContinue 'starred repositories', response, after, receiveStarredRepos
 
   clearJob = ->
+    log.info 'clearing job for user:'
+    console.dir user
     eventBroker.publish events.database.update, {
       type: 'users'
       query
