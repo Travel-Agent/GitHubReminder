@@ -52,7 +52,7 @@ runDueJobs = ->
           if error
             log.error "failed due job ##{index}, reason `#{error}`"
             log.error 'failed job:'
-            console.dir user
+            return console.dir user
 
           log.info "completed due job ##{index}"
 
