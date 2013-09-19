@@ -10,7 +10,14 @@ failOrContinue = (request, response, next, onError) ->
 
 getMessage = (response) ->
   # TODO: think this through properly
-  "Error: #{response.status} #{if response.body.error then response.body.error else response.body}"
+  if response.body.error
+    message = response.body.error
+  else if response.body.message
+    message = response.body.message
+  else
+    message = response.body
+
+  "Error: #{response.status} #{message}"
 
 module.exports = { failOrContinue }
 
