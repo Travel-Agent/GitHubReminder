@@ -65,7 +65,7 @@ request = (what, options, data, callback) ->
       body += response.read()
 
     response.on 'end', ->
-      body = if response.statusCode is 200 then JSON.parse body else body
+      body = JSON.parse body
 
       log.info "response body for #{response.statusCode} from `#{options.path}`:"
       console.dir body

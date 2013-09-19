@@ -61,10 +61,24 @@ runDueJobs = ->
 runJob = (error, user, after) ->
   repos = undefined
   retryCount = 0
+  query =
+    name: user.name
 
   getStarredRepos = ->
     eventBroker.publish events.github.getStarredAll, user.auth, (response) ->
+      if response.status is 403 and response.body.message is 'Bad credentials'
+        clearJob()
       httpFailOrContinue 'starred repositories', response, after, receiveStarredRepos
+
+  clearJob = ->
+    eventBroker.publish events.database.update, {
+      type: 'users'
+      query
+      set: {}
+      unset:
+        job: null
+        isSaved: null
+    }
 
   receiveStarredRepos = (ignore, result) ->
     repos = result
@@ -81,8 +95,7 @@ runJob = (error, user, after) ->
     user.unsubscribe = token
     eventBroker.publish events.database.update, {
       type: 'users'
-      query:
-        name: user.name
+      query
       set:
         unsubscribe: token
       unset: {}
@@ -122,8 +135,7 @@ runJob = (error, user, after) ->
   updateJob = (job) ->
     eventBroker.publish events.database.update, {
       type: 'users'
-      query:
-        name: user.name
+      query
       set: { job }
       unset: {}
     }, after
