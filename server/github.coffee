@@ -65,11 +65,18 @@ request = (what, options, data, callback) ->
       body += response.read()
 
     response.on 'end', ->
-      callback
+      body = JSON.parse body
+
+      if response.statusCode >= 400
+        log.error "{response.statusCode} response body from `#{options.path}`:"
+        console.dir body
+
+      callback {
         status: response.statusCode
         origin: "#{response.req.method} #{response.req.path}"
         headers: response.headers
-        body: JSON.parse body
+        body
+      }
 
   if data
     log.info "writing data `#{data}` to `#{options.path}`"
