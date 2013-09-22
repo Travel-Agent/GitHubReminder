@@ -119,6 +119,27 @@ doAsync = (object, methodName, args, after, failOnError, retryCount = 0) ->
   log.info "calling `#{methodName}` with following arguments:"
   console.dir args
 
+  # TODO: Use retrier once action/done is implemented
+  #success = false
+  #eventBroker.publish events.retrier.try
+  #  until: ->
+  #    success
+  #  action: (done) ->
+  #    after = after || ->
+  #    argsCloned = args.slice 0
+  #    argsCloned.push (error, result) ->
+  #      if error
+  #        return log.error "`#{methodName}` returned error `#{error}`"
+  #      success = true
+  #    object[methodName].apply object, argsCloned
+  #  fail: ->
+  #    if failOnError
+  #      log.error 'fatal, exiting'
+  #      return process.exit 1
+  #    after error, null
+  #  limit: 4
+  #  interval: -1000
+
   after = after || ->
   argsCloned = args.slice 0
 
