@@ -18,16 +18,13 @@ initialise = ->
 
 blockHelper = (name, options) ->
   if typeof handlebars.partials[name] is 'string'
-    log.info "compiling partial `#{name}`"
     handlebars.partials[name] = handlebars.compile handlebars.partials[name]
 
   partial = handlebars.partials[name] || options.fn;
 
-  log.info "rendering partial `#{name}`"
   partial this, data: options.hash
 
 partialHelper = (name, options) ->
-  log.info "registering partial `#{name}`"
   handlebars.registerPartial name, options.fn
 
 registerLayout = (error, template) ->
@@ -35,7 +32,6 @@ registerLayout = (error, template) ->
     log.error "fatal error reading layout.html, `#{error}`"
     process.exit 1
 
-  log.info 'registering layout partial'
   handlebars.registerPartial 'layout', handlebars.compile template
 
 module.exports = { initialise }
