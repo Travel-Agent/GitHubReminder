@@ -113,7 +113,7 @@ parsePaginationLink = (link) ->
   key = parts[1].substring parts[1].indexOf('"') + 1, parts[1].lastIndexOf '"'
   { key, url }
 
-combinePaginationLinks = (link, result) ->
+combinePaginationLinks = (result, link) ->
   result[link.key] = link.url
   result
 
