@@ -115,56 +115,37 @@ connected = (connection, authenticate = true) ->
   collecions = {}
   getCollections()
 
-doAsync = (object, methodName, args, after, failOnError, retryCount = 0) ->
+doAsync = (object, methodName, args, after, failOnError) ->
   log.info "calling `#{methodName}` with following arguments:"
   console.dir args
 
-  # TODO: Use retrier once action/done is implemented
-  #success = false
-  #eventBroker.publish events.retrier.try
-  #  until: ->
-  #    success
-  #  action: (done) ->
-  #    after = after || ->
-  #    argsCloned = args.slice 0
-  #    argsCloned.push (error, result) ->
-  #      if error
-  #        return log.error "`#{methodName}` returned error `#{error}`"
-  #      success = true
-  #    object[methodName].apply object, argsCloned
-  #  fail: ->
-  #    if failOnError
-  #      log.error 'fatal, exiting'
-  #      return process.exit 1
-  #    after error, null
-  #  limit: 4
-  #  interval: -1000
-
+  success = false
   after = after || ->
-  argsCloned = args.slice 0
 
-  argsCloned.push (error, result) ->
-    # TODO: Use retrier
-    if error
-      log.error "`#{methodName}` returned error `#{error}`"
-
-      if retryCount < 3
-        return doAsync object, methodName, args, after, failOnError, retryCount + 1
-
+  eventBroker.publish events.retrier.try,
+    until: ->
+      success
+    action: (done) ->
+      argsCloned = args.slice 0
+      argsCloned.push (error, result) ->
+        if error
+          log.error "`#{methodName}` returned error `#{error}`"
+        else
+          success = true
+          # TODO: This condition is ridiculous; harmonise functions so they can be treated the same
+          if failOnError
+            after result
+          else
+            after null, result
+        done()
+      object[methodName].apply object, argsCloned
+    fail: ->
       if failOnError
         log.error 'fatal, exiting'
-        process.exit 1
-
-      return after error, null
-
-    log.info "`#{methodName}` returned ok"
-
-    if failOnError
-      return after result
-
-    after null, result
-
-  object[methodName].apply object, argsCloned
+        return process.exit 1
+      after error, null
+    limit: 10
+    interval: 0
 
 module.exports = { initialise }
 

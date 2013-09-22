@@ -11,7 +11,7 @@
 
   log.info('loading server modules');
 
-  modules = ['database', 'retrier', 'templates', 'github', 'email', 'tokens', 'errors', 'jobs'];
+  modules = ['retrier', 'database', 'templates', 'github', 'email', 'tokens', 'errors', 'jobs'];
 
   modules.forEach(function(m) {
     return require("./" + m).initialise();
