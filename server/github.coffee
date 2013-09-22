@@ -92,7 +92,6 @@ getStarred = (oauthToken, sort, direction, count, getAll, callback, results = []
     headers:
       'User-Agent': userAgent
   }, null, (response) ->
-    # TODO: Use retrier
     if response.status is 200
       response.body = results.concat response.body
       links = parsePaginationLinks response.headers.link

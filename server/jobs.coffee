@@ -106,29 +106,33 @@ runJob = (error, user, after) ->
 
   sendReminder = ->
     unsubscribe = "unsubscribe?user=#{user.name}&token=#{user.unsubscribe}"
-    eventBroker.publish events.email.sendReminder, {
-      to: user.email
-      user: user.name
-      frequency: user.frequency
-      repo: selectRandom repos
-      paths: {
-        settings: ''
-        unsubscribe
-        clobber: "#{unsubscribe}&clobber=yes"
-      }
-    }, (error) ->
-      # TODO: Use retrier
-      if error
-        retryCount += 1
-        log.error "failed to send email (attempt ##{retryCount}), reason `#{error}`"
+    sent = false
 
-        if retryCount < retryLimit
-          log.info "retrying in #{retryInterval} milliseconds"
-          return setTimeout sendReminder, retryInterval
-
-        return after error
-
-      generateJob()
+    eventBroker.publish events.retrier.try,
+      until: ->
+        sent
+      action: (done) ->
+        eventBroker.publish events.email.sendReminder, {
+          to: user.email
+          user: user.name
+          frequency: user.frequency
+          repo: selectRandom repos
+          paths: {
+            settings: ''
+            unsubscribe
+            clobber: "#{unsubscribe}&clobber=yes"
+          }
+        }, (error) ->
+          if error
+            log.error "failed to send email (attempt ##{retryCount}), reason `#{error}`"
+          else
+            sent = true
+            generateJob()
+          done()
+      fail: ->
+        after error
+      limit: 13 # Give it a couple of hours before failing
+      interval: -1000
 
   generateJob = ->
     eventBroker.publish events.jobs.generate, user.frequency, (error, job) ->
