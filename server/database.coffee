@@ -80,19 +80,18 @@ connected = (connection, authenticate = true) ->
     (event) ->
       data = event.getData()
 
-      log.info "event handler for #{action}:"
-      console.dir data
-
-      eventBroker.publish events.retrier.try, {
-        name: "database #{action}"
-        predicate: ->
+      eventBroker.publish events.retrier.try,
+        when: ->
           if isConnected is false
-            log.error "no connection for #{action}"
+            log.error "no connection for #{action}:"
+            console.dir data
           isConnected
+        action: ->
+          doAsync collections[data.type], action, getArgs(data), event.respond, false
         fail: ->
           event.respond 'no database connection'
-      }, ->
-        doAsync collections[data.type], action, getArgs(data), event.respond, false
+        limit: 20
+        interval: 200
 
   eventHandlers =
     fetch: createEventHandler 'findOne', (data) ->

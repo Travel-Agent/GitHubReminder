@@ -42,7 +42,8 @@
     "check-types": "0.6.x",
     "nodemailer": "0.5.x",
     "underscore": "1.5.x",
-    "uuid": "1.4.x"
+    "uuid": "1.4.x",
+    "trier": "0.2.x"
   },
   "devDependencies": {
     "uglify-js": "2.4.x",

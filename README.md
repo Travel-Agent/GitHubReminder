@@ -110,6 +110,7 @@ server/tokens.coffee - unique ids
 server/templates.coffee - Handlebars helpers
 server/errors.coffee - universal error handler
 server/log.coffee - logging
+server/retrier.coffee - conditional and repeated function invocation
 
 server/routes - route definitions
 server/routes/helpers - assorted boilerplate abstractions to simplify routes
