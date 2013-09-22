@@ -131,7 +131,7 @@ runJob = (error, user, after) ->
           done()
       fail: ->
         after error
-      limit: 13 # Give it a couple of hours before failing
+      limit: 6 # Give it a minute or so before leaving it for the next job
       interval: -1000
 
   generateJob = ->
