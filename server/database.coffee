@@ -121,13 +121,15 @@ doAsync = (object, methodName, args, after, failOnError) ->
 
   success = false
   after = after || ->
+  result = undefined
 
   eventBroker.publish events.retrier.try,
     until: ->
       success
     action: (done) ->
       argsCloned = args.slice 0
-      argsCloned.push (error, result) ->
+      argsCloned.push (error, r) ->
+        result = r
         if error
           log.error "`#{methodName}` returned error `#{error}`"
         else
