@@ -132,11 +132,6 @@ doAsync = (object, methodName, args, after, failOnError) ->
           log.error "`#{methodName}` returned error `#{error}`"
         else
           success = true
-          # TODO: This condition is ridiculous; harmonise functions so they can be treated the same
-          if failOnError
-            after result
-          else
-            after null, result
         done()
       object[methodName].apply object, argsCloned
     fail: ->
@@ -144,6 +139,12 @@ doAsync = (object, methodName, args, after, failOnError) ->
         log.error 'fatal, exiting'
         return process.exit 1
       after error, null
+    pass: ->
+      # TODO: This condition is ridiculous; harmonise functions so they can be treated the same
+      if failOnError
+        after result
+      else
+        after null, result
     limit: 10
     interval: 0
 

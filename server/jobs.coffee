@@ -127,10 +127,11 @@ runJob = (error, user, after) ->
             log.error "failed to send email (attempt ##{retryCount}), reason `#{error}`"
           else
             sent = true
-            generateJob()
           done()
       fail: ->
         after error
+      pass: ->
+        generateJob()
       limit: 6 # Give it a minute or so before leaving it for the next job
       interval: -1000
 
