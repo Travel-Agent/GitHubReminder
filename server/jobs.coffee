@@ -85,6 +85,9 @@ runJob = (error, user, after) ->
   receiveStarredRepos = (ignore, result) ->
     repos = result
 
+    if repos.length is 0
+      return after "no starred repositories for #{user.name}"
+
     unless user.unsubscribe
       return getToken()
 
