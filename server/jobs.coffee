@@ -86,6 +86,7 @@ runJob = (error, user, after) ->
     repos = result
 
     if repos.length is 0
+      generateJob()
       return after "no starred repositories for #{user.name}"
 
     unless user.unsubscribe
