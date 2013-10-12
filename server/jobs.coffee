@@ -67,15 +67,21 @@ runJob = (error, user, after) ->
   getStarredRepos = ->
     eventBroker.publish events.github.getStarredAll, user.auth, (response) ->
       if response.status is 401 or response.status is 403
-        deleteUser()
+        deleteUser response.status
       httpFailOrContinue 'starred repositories', response, after, receiveStarredRepos
 
-  deleteUser = ->
+  deleteUser = (status) ->
     log.info 'deleting unauthenticated user:'
     console.dir user
     eventBroker.publish events.database.delete, {
       type: 'users'
       query
+    }
+    eventBroker.publish events.email.sendDeletion, {
+      user: user.name
+      emailAddress: user.email
+      frequency: user.frequency
+      status
     }
 
   receiveStarredRepos = (ignore, result) ->

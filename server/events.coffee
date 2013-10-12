@@ -13,7 +13,7 @@ events =
   github: [ 'get-token', 'get-user', 'get-email', 'get-starred-recent', 'get-starred-all' ]
   database: [ 'fetch', 'fetch-all', 'insert', 'update', 'delete' ]
   jobs: [ 'generate', 'force' ]
-  email: [ 'send-reminder', 'send-error', 'send-verification' ]
+  email: [ 'send-reminder', 'send-error', 'send-verification', 'send-deletion' ]
   tokens: [ 'generate' ]
   errors: [ 'report' ]
   retrier: [ 'try' ]
