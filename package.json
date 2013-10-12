@@ -43,7 +43,7 @@
     "nodemailer": "0.5.x",
     "underscore": "1.5.x",
     "uuid": "1.4.x",
-    "trier": "0.3.x"
+    "trier": "0.3.4"
   },
   "devDependencies": {
     "uglify-js": "2.4.x",
