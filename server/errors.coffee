@@ -21,7 +21,7 @@ initialise = ->
       }
 
       eventBroker.publish events.email.sendError, data
-      request.reply.view 'content/error.html', data
+      request.reply?.view 'content/error.html', data
 
   eventBroker.subscribe 'errors', eventHandlers
 
