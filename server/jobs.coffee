@@ -59,7 +59,7 @@ runDueJobs = ->
   setTimeout runDueJobs, jobFrequency
 
 runJob = (error, user, after) ->
-  repos = undefined
+  repos = repo = undefined
   retryCount = 0
   query =
     name: user.name
@@ -107,6 +107,10 @@ runJob = (error, user, after) ->
   sendReminder = ->
     unsubscribe = "unsubscribe?user=#{user.name}&token=#{user.unsubscribe}"
     sent = false
+    loop
+      repo = selectRandom repos
+      if user.lastReminder isnt repo.full_name or repos.length is 1
+        break
 
     eventBroker.publish events.retrier.try,
       until: ->
@@ -116,7 +120,7 @@ runJob = (error, user, after) ->
           to: user.email
           user: user.name
           frequency: user.frequency
-          repo: selectRandom repos
+          repo
           paths: {
             settings: ''
             unsubscribe
@@ -143,7 +147,7 @@ runJob = (error, user, after) ->
     eventBroker.publish events.database.update, {
       type: 'users'
       query
-      set: { job }
+      set: { job, lastReminder: repo.full_name }
       unset: {}
     }, after
 
