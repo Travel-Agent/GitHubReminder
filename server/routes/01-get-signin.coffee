@@ -18,7 +18,6 @@ module.exports =
         request.reply.view 'content/signin.html',
           url: "#{config.uri}?client_id=#{encodeURIComponent config.id}&scope=#{encodeURIComponent config.scope}&state=#{encodeURIComponent token}"
 
-      log.info 'handling request'
       log.info 'state:'
       console.dir request.state
 

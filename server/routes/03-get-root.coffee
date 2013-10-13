@@ -126,7 +126,6 @@ module.exports =
           unsubscribeLink: "/unsubscribe?user=#{currentUser.name}&token=#{currentUser.unsubscribe}&clobber=yes"
         }
 
-      log.info 'handling request'
       log.info 'query:'
       console.dir request.query
       log.info 'state:'

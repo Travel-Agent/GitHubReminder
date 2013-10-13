@@ -26,7 +26,6 @@ initialise = ->
   eventBroker.subscribe 'jobs', eventHandlers
 
 runDueJobs = ->
-  log.info 'getting due jobs'
   eventBroker.publish events.database.fetchAll, {
     type: 'users'
     query:
@@ -189,13 +188,14 @@ clearExpiredVerifications = ->
 
 eventHandlers =
   generate: (event) ->
-    log.info "generating job for `#{event.getData()}`"
-    frequency = frequencies[event.getData()]
-    if check.isNumber(frequency) is false
-      log.error "bad frequency `#{event.getData()}`"
+    frequency = event.getData()
+    interval = frequencies[frequency]
+    if check.isNumber(interval) is false
+      log.error "bad frequency `#{frequency}`"
       return event.respond 'Invalid frequency'
-    log.info "returning job `#{Date.now() + frequency}`"
-    event.respond null, Date.now() + frequency
+    result = Date.now() + interval
+    log.info "returning `#{frequency}` job `#{result}`"
+    event.respond null, result
 
   force: (event) ->
     log.info 'forcing immediate job'

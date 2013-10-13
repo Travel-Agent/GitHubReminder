@@ -50,7 +50,6 @@ module.exports =
         request.auth.session.set { user: user.name, auth }
         request.reply.redirect '/'
 
-      log.info 'handling request:'
       log.info 'query:'
       console.dir request.query
       log.info 'state:'

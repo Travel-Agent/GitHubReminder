@@ -19,7 +19,7 @@ initialise = ->
 
 eventHandlers =
   getToken: (event) ->
-    request 'access token', {
+    request {
       host: 'github.com'
       path: '/login/oauth/access_token'
       method: 'POST'
@@ -29,7 +29,7 @@ eventHandlers =
     }, "client_id=#{config.id}&client_secret=#{config.secret}&code=#{event.getData()}", event.respond
 
   getUser: (event) ->
-    request 'user', {
+    request {
       host: host
       path: "/user?access_token=#{event.getData()}"
       method: 'GET'
@@ -39,7 +39,7 @@ eventHandlers =
     }, null, event.respond
 
   getEmail: (event) ->
-    request 'email', {
+    request {
       host: host
       path: "/user/emails?access_token=#{event.getData()}"
       method: 'GET'
@@ -54,8 +54,7 @@ eventHandlers =
   getStarredAll: (event) ->
     getStarred event.getData(), 'created', 'asc', 100, true, event.respond
 
-request = (what, options, data, callback) ->
-  log.info "requesting #{what} from `#{options.path}`"
+request = (options, data, callback) ->
   req = https.request options, (response) ->
     log[if response.statusCode >= 400 then 'error' else 'info'] "#{response.statusCode} result from `#{options.path}`"
 
@@ -85,7 +84,7 @@ request = (what, options, data, callback) ->
   req.end()
 
 getStarred = (oauthToken, sort, direction, count, getAll, callback, results = [], path = '') ->
-  request 'stars', {
+  request {
     host: host
     path: path || "/user/starred?access_token=#{oauthToken}&sort=#{sort}&direction=#{direction}&per_page=#{count}"
     method: 'GET'
