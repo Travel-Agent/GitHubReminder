@@ -114,7 +114,9 @@ runJob = (error, user, after) ->
     sent = false
     loop
       repo = selectRandom repos
-      if user.lastReminder isnt repo.full_name or repos.length is 1
+      if repos.length < 3
+        break
+      if user.lastReminder isnt repo.full_name and repo.full_name isnt 'philbooth/GitHubReminder'
         break
 
     eventBroker.publish events.retrier.try,
