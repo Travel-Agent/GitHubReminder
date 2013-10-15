@@ -154,7 +154,7 @@ runJob = (error, user, after) ->
     eventBroker.publish events.database.update, {
       type: 'users'
       query
-      set: { job, lastReminder: repo.full_name }
+      set: { job, lastReminder: repo?.full_name  }
       unset: {}
     }, after
 
