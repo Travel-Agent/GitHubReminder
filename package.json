@@ -1,7 +1,7 @@
 {
   "name": "GitHubReminder",
   "mod-project-name": "GitHubReminder",
-  "description": "Source code for https://githubreminder.org/",
+  "description": "Serendipitous email reminders for your starred repos on GitHub.",
   "version": "0.0.1",
   "author": "Phil Booth <pmbooth@gmail.com",
   "contributors": [

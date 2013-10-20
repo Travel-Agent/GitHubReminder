@@ -1,9 +1,9 @@
 # GitHubReminder
 
-https://githubreminder.org/
-
-A serendipitous email reminder
+Serendipitous email reminders
 for your starred repos on GitHub.
+
+https://githubreminder.org/
 
 ## Dependencies
 
