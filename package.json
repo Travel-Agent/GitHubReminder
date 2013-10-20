@@ -2,10 +2,15 @@
   "name": "GitHubReminder",
   "version": "0.0.1",
   "description": "Serendipitous email reminders for your starred repos on GitHub.",
-  "license": "MIT",
   "homepage": "https://githubreminder.org/",
   "bugs": "https://github.com/philbooth/GitHubReminder/issues",
+  "license": "MIT",
   "author": "Phil Booth <pmbooth@gmail.com> (https://github.com/philbooth)",
+  "main": "./server",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/philbooth/GitHubReminder.git"
+  },
   "dependencies": {
     "coffee-script": "1.6.x",
     "hapi": "1.9.x",
@@ -24,7 +29,6 @@
     "autoprefixer": "0.8.x",
     "clean-css": "1.0.x"
   },
-  "main": "./server",
   "scripts": {
       "compile-coffee-back": "./node_modules/.bin/coffee -c --output server server/index.coffee",
       "build-back": "npm run compile-coffee-back",
